@@ -1,13 +1,13 @@
-package com.events.eventsAPI;
+package br.edu.ifsudestemg.eventsAPI;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class EventsApiApplication {
+public class Application {
 
 	public static void main(String[] args) {
-		SpringApplication.run(EventsApiApplication.class, args);
+		SpringApplication.run(Application.class, args);
 	}
 
 }
