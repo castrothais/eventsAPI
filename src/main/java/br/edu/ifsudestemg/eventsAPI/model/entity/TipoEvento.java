@@ -1,5 +1,6 @@
-package model.entity;
+package br.edu.ifsudestemg.eventsAPI.model.entity;
 
+import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -7,23 +8,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-
+@Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 
-public abstract  class Pessoa {
+public class TipoEvento {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String nome;
-    private String cpf;
-    private LocalDate data;
-    private String genero;
-    private String senha;
-    private String celular;
-    private String email;
-    private Endereco endereco;
+    private String descricao;
 }

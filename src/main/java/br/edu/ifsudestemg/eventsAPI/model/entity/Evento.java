@@ -1,4 +1,4 @@
-package com.events.eventsAPI.model.entity;
+package br.edu.ifsudestemg.eventsAPI.model.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

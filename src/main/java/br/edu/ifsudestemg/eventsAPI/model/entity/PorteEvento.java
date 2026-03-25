@@ -1,4 +1,4 @@
-package com.events.eventsAPI.model.entity;
+package br.edu.ifsudestemg.eventsAPI.model.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,12 +12,15 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+public class PorteEvento {
 
-public class TipoEvento {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String nome;
+    private Integer minParticipantes;
+    private Integer maxParticipantes;
+    private Integer tempoMinimoCancelamento;
     private String descricao;
 }
