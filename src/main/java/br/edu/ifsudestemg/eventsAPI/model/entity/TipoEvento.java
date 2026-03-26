@@ -1,9 +1,6 @@
 package br.edu.ifsudestemg.eventsAPI.model.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,4 +17,8 @@ public class TipoEvento {
 
     private String nome;
     private String descricao;
+
+
+    @ManyToOne
+    private Evento evento;
 }

@@ -26,7 +26,23 @@ public class Evento {
     private String descricao;
     private Integer idadeMinima;
     private Integer lotacaoMaxima;
-    private PorteEvento porteEvento;
+    //private PorteEvento porteEvento;
+    //private TipoEvento tipoEvento;
+    private Endereco endereco;
+
+    //@ManyToOne
+    //private Organizador Organizador;
+
+    @ManyToOne
+    private Ministrante ministrante;
+
+    @ManyToOne
     private TipoEvento tipoEvento;
-    // private Endereco endereco;
+
+    @ManyToOne
+    private PorteEvento porteEvento;
+
+    @ManyToOne
+    private Ingresso ingresso;
+
 }

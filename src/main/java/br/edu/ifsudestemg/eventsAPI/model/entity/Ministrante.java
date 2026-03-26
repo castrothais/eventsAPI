@@ -16,4 +16,9 @@ public class Ministrante extends OrganizadorCPF {
     private String nomeFantasia;
     private String cnpj;
     private String inscricaoEstadualMunicipal;
+
+    @ManyToOne
+    private Evento evento;
+    @ManyToOne
+    private Atividade atividade;
 }
