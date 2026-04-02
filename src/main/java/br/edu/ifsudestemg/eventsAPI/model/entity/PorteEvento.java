@@ -20,7 +20,4 @@ public class PorteEvento {
     private Integer maxParticipantes;
     private Integer tempoMinimoCancelamento;
     private String descricao;
-
-    @ManyToOne
-    private Evento evento;
 }

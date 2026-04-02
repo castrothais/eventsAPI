@@ -11,9 +11,4 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 
 public class TipoAtividade {
-    @ManyToOne
-    private Atividade atividade;
-
-    @ManyToOne
-    private Ministrante ministrante;
 }

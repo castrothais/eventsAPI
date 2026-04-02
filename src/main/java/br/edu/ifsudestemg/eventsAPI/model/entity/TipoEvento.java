@@ -17,8 +17,4 @@ public class TipoEvento {
 
     private String nome;
     private String descricao;
-
-
-    @ManyToOne
-    private Evento evento;
 }

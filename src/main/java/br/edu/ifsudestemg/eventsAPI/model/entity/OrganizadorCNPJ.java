@@ -11,13 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class OrganizadorCNPJ extends Pessoa{
+public class OrganizadorCNPJ extends Organizador {
     private String razaoSocial;
     private String nomeFantasia;
     private String cnpj;
     private String inscricaoEstadualMunicipal;
-
-    @ManyToOne
-    private Evento evento;
-
 }

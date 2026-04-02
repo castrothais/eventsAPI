@@ -6,4 +6,6 @@ public class Ingresso {
     @ManyToOne
     private Participante participante;
 
+    @ManyToOne
+    private Evento evento;
 }
