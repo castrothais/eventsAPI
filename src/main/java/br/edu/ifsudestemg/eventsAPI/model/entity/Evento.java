@@ -1,4 +1,4 @@
-package com.events.eventsAPI.model.entity;
+package br.edu.ifsudestemg.eventsAPI.model.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -26,7 +26,18 @@ public class Evento {
     private String descricao;
     private Integer idadeMinima;
     private Integer lotacaoMaxima;
-    private PorteEvento porteEvento;
+    private Endereco endereco;
+
+    @ManyToOne
+    private Organizador organizador;
+
+    @ManyToOne
+    private Ministrante ministrante;
+
+    @ManyToOne
     private TipoEvento tipoEvento;
-    // private Endereco endereco;
+
+    @ManyToOne
+    private PorteEvento porteEvento;
+
 }
