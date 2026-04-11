@@ -10,7 +10,8 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@MappedSuperclass
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 
 public abstract class Pessoa {
     @Id

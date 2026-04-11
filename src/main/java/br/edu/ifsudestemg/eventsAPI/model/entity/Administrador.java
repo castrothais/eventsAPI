@@ -1,8 +1,9 @@
 package br.edu.ifsudestemg.eventsAPI.model.entity;
 
-import lombok.AllArgsConstructor;
+import jakarta.persistence.Entity;
 import lombok.NoArgsConstructor;
 
+@Entity
 @NoArgsConstructor
 
 public class Administrador extends Pessoa {
