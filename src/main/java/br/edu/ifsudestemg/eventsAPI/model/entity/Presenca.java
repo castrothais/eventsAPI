@@ -11,8 +11,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 
 public class Presenca {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private Boolean presente;
+
     @ManyToOne
-    private Evento evento;
+    private Participante participante;
 
     @ManyToOne
     private Atividade atividade;

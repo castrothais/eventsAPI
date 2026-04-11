@@ -1,10 +1,11 @@
 package br.edu.ifsudestemg.eventsAPI.model.entity;
 
-import lombok.Data;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.Embeddable;
+import lombok.*;
 
-@Data
+@Embeddable
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 

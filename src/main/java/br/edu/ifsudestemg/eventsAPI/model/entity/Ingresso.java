@@ -1,8 +1,14 @@
 package br.edu.ifsudestemg.eventsAPI.model.entity;
 
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
+
+@Entity
 
 public class Ingresso {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @ManyToOne
     private Participante participante;
 

@@ -32,9 +32,6 @@ public class Evento {
     private Organizador organizador;
 
     @ManyToOne
-    private Ministrante ministrante;
-
-    @ManyToOne
     private TipoEvento tipoEvento;
 
     @ManyToOne

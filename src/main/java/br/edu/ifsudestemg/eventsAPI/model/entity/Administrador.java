@@ -4,8 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-@AllArgsConstructor
 
-public class Administrador extends Pessoa{
+public class Administrador extends Pessoa {
 
 }
