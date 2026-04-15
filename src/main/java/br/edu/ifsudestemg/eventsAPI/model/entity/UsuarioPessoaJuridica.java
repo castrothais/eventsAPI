@@ -1,9 +1,8 @@
 package br.edu.ifsudestemg.eventsAPI.model.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
-import lombok.Data;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -11,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class OrganizadorCNPJ extends Organizador {
+public class UsuarioPessoaJuridica extends Usuario{
     private String razaoSocial;
     private String nomeFantasia;
     private String cnpj;

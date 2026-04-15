@@ -1,6 +1,6 @@
 package br.edu.ifsudestemg.eventsAPI.api.dto;
 
-import br.edu.ifsudestemg.eventsAPI.model.entity.Pessoa;
+import br.edu.ifsudestemg.eventsAPI.model.entity.Usuario;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,7 +21,7 @@ public class PessoaDTO {
     private String celular;
     private String email;
 
-    public static PessoaDTO create(Pessoa pessoa) {
+    public static PessoaDTO create(Usuario pessoa) {
         ModelMapper modelMapper = new ModelMapper();
         PessoaDTO dto = modelMapper.map(pessoa, PessoaDTO.class);
         return dto;

@@ -16,7 +16,7 @@ public class Ingresso {
     private Long id;
 
     @ManyToOne
-    private Participante participante;
+    private Usuario participante;
 
     @ManyToOne
     private Evento evento;

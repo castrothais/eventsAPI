@@ -1,6 +1,5 @@
 package br.edu.ifsudestemg.eventsAPI.api.dto;
 
-import br.edu.ifsudestemg.eventsAPI.model.entity.Organizador;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -1,6 +1,5 @@
 package br.edu.ifsudestemg.eventsAPI.api.dto;
 
-import br.edu.ifsudestemg.eventsAPI.model.entity.Administrador;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,7 +11,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class AdministradorDTO {
+public class
+AdministradorDTO {
 
     private String nome;
     private String cpf;

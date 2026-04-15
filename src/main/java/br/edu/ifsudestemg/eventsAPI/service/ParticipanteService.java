@@ -1,6 +1,5 @@
 package br.edu.ifsudestemg.eventsAPI.service;
 
-import br.edu.ifsudestemg.eventsAPI.model.entity.Participante;
 import br.edu.ifsudestemg.eventsAPI.model.repository.ParticipanteRepository;
 import org.springframework.stereotype.Service;
 

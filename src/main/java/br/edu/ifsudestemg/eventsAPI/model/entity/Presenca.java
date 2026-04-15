@@ -18,7 +18,7 @@ public class Presenca {
     private Boolean presente;
 
     @ManyToOne
-    private Participante participante;
+    private Usuario participante;
 
     @ManyToOne
     private Atividade atividade;

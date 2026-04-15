@@ -21,7 +21,7 @@ public class Atividade {
     private Evento evento;
 
     @ManyToOne
-    private Ministrante ministrante;
+    private Usuario ministrante;
 
     @ManyToOne
     private TipoAtividade tipoAtividade;

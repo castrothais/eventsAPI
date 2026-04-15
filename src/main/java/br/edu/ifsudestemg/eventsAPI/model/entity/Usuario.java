@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -13,18 +13,23 @@ import java.time.LocalDate;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 
-public abstract class Pessoa {
+public abstract class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private String nome;
-    private String cpf;
-    private LocalDate data;
     private String senha;
     private String celular;
     private String email;
 
     @Embedded
     private Endereco endereco;
+
+    @ElementCollection(targetClass = Perfil.class)
+    @Enumerated(EnumType.STRING)
+    @CollectionTable(
+            name = "usuario_perfil",
+            joinColumns = @JoinColumn(name = "usuario_id")
+    )
+    @Column(name = "perfil")
+    private List<Perfil> perfis;
 }
