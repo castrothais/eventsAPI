@@ -10,6 +10,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class Ministrante extends Organizador {
-
+public class UsuarioPessoaJuridica extends Usuario{
+    private String razaoSocial;
+    private String nomeFantasia;
+    private String cnpj;
+    private String inscricaoEstadualMunicipal;
 }

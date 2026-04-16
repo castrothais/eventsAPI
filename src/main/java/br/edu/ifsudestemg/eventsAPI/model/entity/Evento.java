@@ -29,10 +29,7 @@ public class Evento {
     private Endereco endereco;
 
     @ManyToOne
-    private Organizador organizador;
-
-    @ManyToOne
-    private Ministrante ministrante;
+    private Usuario organizador;
 
     @ManyToOne
     private TipoEvento tipoEvento;

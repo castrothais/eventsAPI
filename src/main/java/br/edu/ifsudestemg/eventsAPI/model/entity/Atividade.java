@@ -11,11 +11,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 
 public class Atividade {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String nome;
+
     @ManyToOne
     private Evento evento;
 
     @ManyToOne
-    private Ministrante ministrante;
+    private Usuario ministrante;
 
     @ManyToOne
     private TipoAtividade tipoAtividade;
