@@ -23,7 +23,7 @@ public class IngressoDTO {
         ModelMapper modelMapper = new ModelMapper();
         IngressoDTO dto = modelMapper.map(ingresso, IngressoDTO.class);
 
-        dto.nomeParticipante = ingresso.getParticipante().getNome();
+        dto.nomeParticipante = ingresso.getParticipante().getNomeUsuario();
         dto.nomeEvento = ingresso.getEvento().getNome();
 
         return dto;

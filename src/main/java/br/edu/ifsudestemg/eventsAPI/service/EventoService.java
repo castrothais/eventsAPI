@@ -3,8 +3,10 @@ package br.edu.ifsudestemg.eventsAPI.service;
 import br.edu.ifsudestemg.eventsAPI.model.entity.Evento;
 import br.edu.ifsudestemg.eventsAPI.model.repository.EventoRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service

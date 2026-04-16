@@ -15,4 +15,9 @@ public class UsuarioPessoaJuridica extends Usuario{
     private String nomeFantasia;
     private String cnpj;
     private String inscricaoEstadualMunicipal;
+
+    @Override
+    public String getNomeUsuario(){
+        return this.nomeFantasia;
+    }
 }

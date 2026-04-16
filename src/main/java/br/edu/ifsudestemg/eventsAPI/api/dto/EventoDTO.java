@@ -35,7 +35,7 @@ public class EventoDTO {
         ModelMapper modelMapper = new ModelMapper();
         EventoDTO dto = modelMapper.map(evento, EventoDTO.class);
 
-        dto.nomeOrganizador = evento.getOrganizador().getNome();
+        dto.nomeOrganizador = evento.getOrganizador().getNomeUsuario();
         dto.nomeTipoEvento = evento.getTipoEvento().getNome();
         dto.nomePorteEvento = evento.getPorteEvento().getNome();
 

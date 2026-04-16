@@ -25,7 +25,7 @@ public class AtividadeDTO {
         ModelMapper modelMapper = new ModelMapper();
         AtividadeDTO dto = modelMapper.map(atividade, AtividadeDTO.class);
         dto.nomeEvento = atividade.getEvento().getNome();
-        dto.nomeMinistrante = atividade.getMinistrante().getNome();
+        dto.nomeMinistrante = atividade.getMinistrante().getNomeUsuario();
         dto.nomeTipoAtividade = atividade.getTipoAtividade().getNome();
         return dto;
     }

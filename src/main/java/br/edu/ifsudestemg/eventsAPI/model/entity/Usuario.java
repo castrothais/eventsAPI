@@ -21,6 +21,7 @@ public abstract class Usuario {
     private String celular;
     private String email;
 
+
     @Embedded
     private Endereco endereco;
 
@@ -32,4 +33,8 @@ public abstract class Usuario {
     )
     @Column(name = "perfil")
     private List<Perfil> perfis;
+
+    public abstract String getNomeUsuario();
+
+    //public abstract String getDocumentoUsuario();
 }
