@@ -1,6 +1,6 @@
 package br.edu.ifsudestemg.eventsAPI.service;
 
-import br.edu.ifsudestemg.eventsAPI.model.repository.ParticipanteRepository;
+import br.edu.ifsudestemg.eventsAPI.model.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,9 +9,9 @@ import java.util.Optional;
 @Service
 public class ParticipanteService {
 
-    private ParticipanteRepository repository;
+    private UsuarioRepository repository;
 
-    public ParticipanteService(ParticipanteRepository repository) {
+    public ParticipanteService(UsuarioRepository repository) {
         this.repository = repository;
     }
 
