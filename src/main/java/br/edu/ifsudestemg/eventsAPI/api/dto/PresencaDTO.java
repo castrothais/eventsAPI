@@ -24,7 +24,7 @@ public class PresencaDTO {
         ModelMapper modelMapper = new ModelMapper();
         PresencaDTO dto = modelMapper.map(presenca, PresencaDTO.class);
 
-        dto.nomeParticipante = presenca.getParticipante().getNome();
+        dto.nomeParticipante = presenca.getParticipante().getNomeUsuario();
         dto.nomeAtividade = presenca.getAtividade().getNome();
 
         return dto;

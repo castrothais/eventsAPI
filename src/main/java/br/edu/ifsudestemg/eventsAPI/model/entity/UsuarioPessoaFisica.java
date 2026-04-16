@@ -17,4 +17,9 @@ public class UsuarioPessoaFisica extends Usuario{
     private String cpf;
     private LocalDate data;
     private String genero;
+
+    @Override
+    public String getNomeUsuario(){
+        return this.nome;
+    }
 }
