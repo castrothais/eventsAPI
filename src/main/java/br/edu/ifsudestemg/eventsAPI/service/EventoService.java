@@ -24,4 +24,18 @@ public class EventoService {
     public Optional<Evento> getEventosById(Long id) {
         return repository.findById(id);
     }
+
+    @Transactional
+    public Evento salvar(Evento evento) {
+        validar(evento);
+        return repository.save(evento);
+    }
+
+    @Transactional
+    public void excluir(Evento evento) {
+        Objects.requireNonNull(evento.getId());
+        repository.delete(evento);
+    }
+
+    public void validar(Evento evento) {}
 }

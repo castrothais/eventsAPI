@@ -3,8 +3,10 @@ package br.edu.ifsudestemg.eventsAPI.service;
 import br.edu.ifsudestemg.eventsAPI.model.entity.Ingresso;
 import br.edu.ifsudestemg.eventsAPI.model.repository.IngressoRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -23,4 +25,18 @@ public class IngressoService {
     public Optional<Ingresso> getIngressosById(Long id) {
         return repository.findById(id);
     }
+
+    @Transactional
+    public Ingresso salvar(Ingresso ingresso) {
+        validar(ingresso);
+        return repository.save(ingresso);
+    }
+
+    @Transactional
+    public void excluir(Ingresso ingresso) {
+        Objects.requireNonNull(ingresso.getId());
+        repository.delete(ingresso);
+    }
+
+    public void validar(Ingresso ingresso) {};
 }
