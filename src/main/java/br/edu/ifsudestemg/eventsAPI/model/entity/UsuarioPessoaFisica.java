@@ -1,6 +1,7 @@
 package br.edu.ifsudestemg.eventsAPI.model.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,9 +14,19 @@ import java.time.LocalDate;
 @AllArgsConstructor
 
 public class UsuarioPessoaFisica extends Usuario{
+    @NotBlank(message = "Nome é obrigatório")
+    @Size(min = 1, max = 255, message = "Nome deve ter entre 1 e 255 caracteres")
     private String nome;
+
+    @NotBlank(message = "CPF é obrigatório")
+    @Pattern(regexp = "^\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}$", message = "Formato: 000.000.000-00")
     private String cpf;
+
+    @NotBlank(message = "Data de nascimento é obrigatório")
+    @Past
     private LocalDate data;
+
+    @NotBlank(message = "Genêro é obrigatório")
     private String genero;
 
     @Override
