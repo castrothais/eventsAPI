@@ -1,5 +1,6 @@
 package br.edu.ifsudestemg.eventsAPI.service;
 
+import br.edu.ifsudestemg.eventsAPI.api.exeption.RegraNegocioException;
 import br.edu.ifsudestemg.eventsAPI.model.entity.TipoAtividade;
 import br.edu.ifsudestemg.eventsAPI.model.repository.TipoAtividadeRepository;
 import org.springframework.stereotype.Service;
@@ -38,5 +39,17 @@ public class TipoAtividadeService {
         repository.delete(tipoAtividade);
     }
 
-    public void validar(TipoAtividade tipoAtividade) {};
+    public void validar(TipoAtividade tipoAtividade) {
+        String nomeTrim = tipoAtividade.getNome().trim();
+        if (nomeTrim.isBlank()) {
+            throw new RegraNegocioException("Nome não pode ser vazio");
+        }
+        if (!nomeTrim.matches(".*[a-zA-ZÀ-ÿ].*")) {
+            throw new RegraNegocioException("Nome deve conter letras válidas");
+        }
+
+        if (tipoAtividade.getId() == null && repository.existsByNomeIgnoreCase(tipoAtividade.getNome())) {
+            throw new RegraNegocioException("Já existe um tipo de atividade com esse nome");
+        }
+    }
 }

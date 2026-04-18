@@ -14,6 +14,7 @@ public class AtividadeDTO {
 
     private Long id;
     private String nome;
+    private Boolean cancelado;
     private Long idEvento;
     private String nomeEvento;
     private Long idMinistrante;

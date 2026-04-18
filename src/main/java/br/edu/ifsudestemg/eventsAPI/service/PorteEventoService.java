@@ -1,5 +1,6 @@
 package br.edu.ifsudestemg.eventsAPI.service;
 
+import br.edu.ifsudestemg.eventsAPI.api.exeption.RegraNegocioException;
 import br.edu.ifsudestemg.eventsAPI.model.entity.PorteEvento;
 import br.edu.ifsudestemg.eventsAPI.model.repository.PorteEventoRepository;
 import org.springframework.stereotype.Service;
@@ -38,5 +39,24 @@ public class PorteEventoService {
         repository.delete(porteEvento);
     }
 
-    public void validar(PorteEvento porteEvento) {};
+    public void validar(PorteEvento porteEvento) {
+        String nomeTrim = porteEvento.getNome().trim();
+        if (nomeTrim.isBlank()) {
+            throw new RegraNegocioException("Nome não pode ser vazio");
+        }
+        if (!nomeTrim.matches(".*[a-zA-ZÀ-ÿ].*")) {
+            throw new RegraNegocioException("Nome deve conter letras válidas");
+        }
+
+        if (porteEvento.getId() == null && repository.existsByNomeIgnoreCase(porteEvento.getNome())) {
+            throw new RegraNegocioException("Já existe um porte de evento com esse nome");
+        }
+
+        if(porteEvento.getMinParticipantes() > porteEvento.getMaxParticipantes()){
+            throw new RegraNegocioException("O número mínimo de participantes não pode ser maior que o número máximo de participantes");
+        }
+        if(porteEvento.getMinParticipantes() > 0){
+            throw new RegraNegocioException("O número mínimo de participantes não pode ser menor que 0");
+        }
+    }
 }

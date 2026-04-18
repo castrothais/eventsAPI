@@ -45,6 +45,4 @@ public abstract class Usuario {
     private List<Perfil> perfis;
 
     public abstract String getNomeUsuario();
-
-    //public abstract String getDocumentoUsuario();
 }

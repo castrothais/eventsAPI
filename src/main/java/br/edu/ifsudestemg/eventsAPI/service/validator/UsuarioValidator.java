@@ -1,4 +1,4 @@
-package br.edu.ifsudestemg.eventsAPI.service;
+package br.edu.ifsudestemg.eventsAPI.service.validator;
 
 import br.edu.ifsudestemg.eventsAPI.model.entity.Usuario;
 

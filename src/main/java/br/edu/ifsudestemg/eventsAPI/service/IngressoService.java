@@ -28,7 +28,6 @@ public class IngressoService {
 
     @Transactional
     public Ingresso salvar(Ingresso ingresso) {
-        validar(ingresso);
         return repository.save(ingresso);
     }
 
@@ -37,6 +36,4 @@ public class IngressoService {
         Objects.requireNonNull(ingresso.getId());
         repository.delete(ingresso);
     }
-
-    public void validar(Ingresso ingresso) {};
 }

@@ -20,6 +20,10 @@ public class Atividade {
     @Size(min = 1, max = 255, message = "Nome deve ter entre 1 e 255 caracteres")
     private String nome;
 
+    @NotNull
+    @Embedded
+    private Boolean cancelado = false;
+
     @NotNull(message = "A atividade deve estar associada a um evento")
     @ManyToOne
     private Evento evento;

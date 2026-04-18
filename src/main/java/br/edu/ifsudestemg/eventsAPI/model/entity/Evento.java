@@ -51,6 +51,10 @@ public class Evento {
     @Embedded
     private Endereco endereco;
 
+    @NotNull
+    @Embedded
+    private Boolean cancelado = false;
+
     @NotNull(message = "A atividade deve estar associada a um organizador")
     @ManyToOne
     private Usuario organizador;
