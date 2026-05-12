@@ -21,7 +21,7 @@ public class EventoDTO {
     private String descricao;
     private Integer idadeMinima;
     private Integer lotacaoMaxima;
-    private Boolean cancelado;
+    private boolean cancelado;
 
     private Long idOrganizador;
     private String nomeOrganizador;

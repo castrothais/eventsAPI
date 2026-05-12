@@ -21,8 +21,7 @@ public class Atividade {
     private String nome;
 
     @NotNull
-    @Embedded
-    private Boolean cancelado = false;
+    private boolean cancelado = false;
 
     @NotNull(message = "A atividade deve estar associada a um evento")
     @ManyToOne

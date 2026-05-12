@@ -17,7 +17,7 @@ public class Presenca {
     private Long id;
 
     @NotNull
-    private Boolean presente;
+    private boolean presente;
 
     @NotNull(message = "A presença deve estar associada a um participante")
     @ManyToOne
