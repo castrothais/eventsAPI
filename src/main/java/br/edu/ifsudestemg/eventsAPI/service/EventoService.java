@@ -77,7 +77,7 @@ public class EventoService {
             throw new RegraNegocioException("Lotação abaixo do mínimo do porte");
         }
 
-        if(evento.getCancelado()) {
+        if(evento.isCancelado()) {
             cancelarEvento(evento);
         }
     }

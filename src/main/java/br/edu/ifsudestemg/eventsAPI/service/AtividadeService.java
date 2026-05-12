@@ -56,7 +56,7 @@ public class AtividadeService {
             throw new RegraNegocioException("Criação/edição de atividade não permitida, evento principal finalizado");
         }
 
-        if(atividade.getCancelado()) {
+        if(atividade.isCancelado()) {
             validarCancelamentoAtividade(atividade);
         }
     }
@@ -65,7 +65,7 @@ public class AtividadeService {
         if(getAtividadesById(atividade.getId()).isEmpty() || atividade.getId() == null){
             throw new RegraNegocioException("Atividade não encontrada");
         }
-        if (repository.countByEventoId(atividade.getEvento().getId()) <= 1 && !atividade.getEvento().getCancelado()) {
+        if (repository.countByEventoId(atividade.getEvento().getId()) <= 1 && !atividade.getEvento().isCancelado()) {
             throw new RegraNegocioException("Evento ativo deve possuir ao menos uma atividade");
         }
     }
