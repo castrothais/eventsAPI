@@ -1,0 +1,113 @@
+package br.edu.ifsudestemg.eventsAPI.api.controller;
+
+import br.edu.ifsudestemg.eventsAPI.api.dto.UsuarioDTO;
+import br.edu.ifsudestemg.eventsAPI.api.exeption.RegraNegocioException;
+import br.edu.ifsudestemg.eventsAPI.model.entity.Usuario;
+import br.edu.ifsudestemg.eventsAPI.model.entity.UsuarioPessoaFisica;
+import br.edu.ifsudestemg.eventsAPI.model.entity.UsuarioPessoaJuridica;
+import br.edu.ifsudestemg.eventsAPI.service.UsuarioService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@RestController
+@RequestMapping("/api/v1/usuario")
+@RequiredArgsConstructor
+public class UsuarioController {
+
+    private final UsuarioService service;
+
+    @GetMapping()
+    public ResponseEntity get() {
+        List<Usuario> usuarios = service.getUsuarios();
+        return ResponseEntity.ok(usuarios.stream().map(UsuarioDTO::create).collect(Collectors.toList()));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity get(@PathVariable("id") Long id) {
+        Optional<Usuario> usuario = service.getUsuariosById(id);
+        if (!usuario.isPresent()) {
+            return new ResponseEntity("Usuario não encontrado", HttpStatus.NOT_FOUND);
+        }
+        return ResponseEntity.ok(usuario.map(UsuarioDTO::create));
+    }
+
+    @PostMapping()
+    public ResponseEntity post(@Valid @RequestBody UsuarioDTO dto) {
+        try {
+
+            Usuario usuario = converter(dto);
+
+            usuario = service.salvar(usuario);
+
+            return new ResponseEntity(usuario, HttpStatus.CREATED);
+
+        } catch (RegraNegocioException e) {
+
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PutMapping("{id}")
+    public ResponseEntity atualizar(
+            @PathVariable("id") Long id,
+           @Valid @RequestBody UsuarioDTO dto
+    ) {
+
+        if (!service.getUsuariosById(id).isPresent()) {
+            return new ResponseEntity("Usuario não encontrado", HttpStatus.NOT_FOUND);
+        }
+
+        try {
+
+            Usuario usuario = converter(dto);
+
+            usuario.setId(id);
+
+            service.salvar(usuario);
+
+            return ResponseEntity.ok(usuario);
+
+        } catch (RegraNegocioException e) {
+
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity excluir(@PathVariable("id") Long id) {
+        Optional<Usuario> usuario = service.getUsuariosById(id);
+        if (!usuario.isPresent()) {
+            return new ResponseEntity("Usuario não encontrado", HttpStatus.NOT_FOUND);
+        }
+        try {
+            service.excluir(usuario.get());
+            return new ResponseEntity(HttpStatus.NO_CONTENT);
+        } catch (RegraNegocioException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    public Usuario converter(UsuarioDTO dto) {
+
+        ModelMapper modelMapper = new ModelMapper();
+
+        if (dto.getTipoUsuario() == null) {
+            throw new RegraNegocioException("Tipo de usuário é obrigatório");
+        }
+
+        return switch (dto.getTipoUsuario()) {
+
+            case PF -> modelMapper.map(dto, UsuarioPessoaFisica.class);
+
+            case PJ -> modelMapper.map(dto, UsuarioPessoaJuridica.class);
+        };
+    }
+}
