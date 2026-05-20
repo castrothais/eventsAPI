@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
@@ -12,6 +13,7 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 
 public class UsuarioPessoaFisica extends Usuario{
     @NotBlank(message = "Nome é obrigatório")
@@ -22,7 +24,7 @@ public class UsuarioPessoaFisica extends Usuario{
     @Pattern(regexp = "^\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}$", message = "Formato: 000.000.000-00")
     private String cpf;
 
-    @NotBlank(message = "Data de nascimento é obrigatório")
+    @NotNull(message = "Data de nascimento é obrigatório")
     @Past
     private LocalDate data;
 
