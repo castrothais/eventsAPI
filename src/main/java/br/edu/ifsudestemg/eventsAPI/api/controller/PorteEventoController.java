@@ -4,6 +4,7 @@ import br.edu.ifsudestemg.eventsAPI.api.dto.PorteEventoDTO;
 import br.edu.ifsudestemg.eventsAPI.api.exeption.RegraNegocioException;
 import br.edu.ifsudestemg.eventsAPI.model.entity.PorteEvento;
 import br.edu.ifsudestemg.eventsAPI.service.PorteEventoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -37,7 +38,7 @@ public class PorteEventoController {
     }
 
     @PostMapping()
-    public ResponseEntity post(PorteEventoDTO dto) {
+    public ResponseEntity post(@Valid @RequestBody PorteEventoDTO dto) {
         try {
             PorteEvento porteEvento = converter(dto);
             porteEvento = service.salvar(porteEvento);
@@ -48,7 +49,7 @@ public class PorteEventoController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity atualizar(@PathVariable("id") Long id, PorteEventoDTO dto) {
+    public ResponseEntity atualizar(@PathVariable("id") Long id, @Valid @RequestBody PorteEventoDTO dto) {
         if (!service.getPorteEventosById(id).isPresent()) {
             return new ResponseEntity("Porte de evento não encontrado", HttpStatus.NOT_FOUND);
         }

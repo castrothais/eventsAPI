@@ -27,12 +27,12 @@ public class PorteEvento {
 
     @Min(1)
     @Max(10000)
-    @NotBlank(message = "Lotação máxima é obrigatória")
+    @NotNull(message = "Lotação máxima é obrigatória")
     private Integer maxParticipantes;
 
     @Min(1)
     @Max(17568)
-    @NotBlank(message = "Tempo mínimo de cancelamento é obrigatório (mais que 0 horas)")
+    @NotNull(message = "Tempo mínimo de cancelamento é obrigatório (mais que 0 horas)")
     private Integer tempoMinimoCancelamento;
 
     @Size(min = 1, max = 255, message = "A descrição deve ter entre 1 e 255 caracteres")
