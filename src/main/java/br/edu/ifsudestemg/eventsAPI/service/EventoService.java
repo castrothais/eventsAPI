@@ -53,15 +53,14 @@ public class EventoService {
             throw new RegraNegocioException("Já existe uma evento com esse nome");
         }
 
-        if(evento.getDataHoraInicio().isBefore(evento.getDataHoraFim()) ) {
+        if(evento.getDataHoraFim().isBefore(evento.getDataHoraInicio()) ) {
             throw new RegraNegocioException("Data fim deve ser após a data início");
         }
+
         if(LocalDateTime.now().getYear() + 2 < evento.getDataHoraInicio().getYear()) {
             throw new RegraNegocioException("Só é possível marcar um evento com até 2 anos de antecedência");
         }
-        if(evento.getDataHoraInicio().isAfter(LocalDateTime.now().plusYears(2))) {
-            throw new RegraNegocioException("Só é possível marcar um evento com até 2 anos de antecedência");
-        }
+
         if(evento.getDataHoraInicio().isBefore(LocalDateTime.now()) || evento.getDataHoraFim().isBefore(LocalDateTime.now())){
             throw new RegraNegocioException("Não é possível criar um evento antes da data atual");
         }
