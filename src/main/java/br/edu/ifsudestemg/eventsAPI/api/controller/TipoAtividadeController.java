@@ -5,6 +5,7 @@ import br.edu.ifsudestemg.eventsAPI.api.dto.TipoAtividadeDTO;
 import br.edu.ifsudestemg.eventsAPI.api.exeption.RegraNegocioException;
 import br.edu.ifsudestemg.eventsAPI.model.entity.TipoAtividade;
 import br.edu.ifsudestemg.eventsAPI.service.TipoAtividadeService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -38,7 +39,7 @@ public class TipoAtividadeController {
     }
 
     @PostMapping()
-    public ResponseEntity post(TipoAtividadeDTO dto) {
+    public ResponseEntity post(@Valid @RequestBody TipoAtividadeDTO dto) {
         try {
             TipoAtividade tipoAtividade = converter(dto);
             tipoAtividade = service.salvar(tipoAtividade);
@@ -49,7 +50,7 @@ public class TipoAtividadeController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity atualizar(@PathVariable("id") Long id, TipoAtividadeDTO dto) {
+    public ResponseEntity atualizar(@PathVariable("id") Long id,@Valid @RequestBody TipoAtividadeDTO dto) {
         if (!service.getTipoAtividadesById(id).isPresent()) {
             return new ResponseEntity("Tipo atividade não encontrada", HttpStatus.NOT_FOUND);
         }

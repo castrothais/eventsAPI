@@ -4,6 +4,7 @@ import br.edu.ifsudestemg.eventsAPI.api.dto.TipoEventoDTO;
 import br.edu.ifsudestemg.eventsAPI.api.exeption.RegraNegocioException;
 import br.edu.ifsudestemg.eventsAPI.model.entity.TipoEvento;
 import br.edu.ifsudestemg.eventsAPI.service.TipoEventoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -37,7 +38,7 @@ public class TipoEventoController {
     }
 
     @PostMapping()
-    public ResponseEntity post(TipoEventoDTO dto) {
+    public ResponseEntity post(@Valid @RequestBody TipoEventoDTO dto) {
         try {
             TipoEvento tipoEvento = converter(dto);
             tipoEvento = service.salvar(tipoEvento);
@@ -48,7 +49,7 @@ public class TipoEventoController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity atualizar(@PathVariable("id") Long id, TipoEventoDTO dto) {
+    public ResponseEntity atualizar(@PathVariable("id") Long id, @Valid @RequestBody TipoEventoDTO dto) {
         if (!service.getTipoEventosById(id).isPresent()) {
             return new ResponseEntity("Tipo evento não encontrado", HttpStatus.NOT_FOUND);
         }
