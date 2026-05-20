@@ -4,7 +4,13 @@ package br.edu.ifsudestemg.eventsAPI.api.controller;
 import br.edu.ifsudestemg.eventsAPI.api.dto.AtividadeDTO;
 import br.edu.ifsudestemg.eventsAPI.api.exeption.RegraNegocioException;
 import br.edu.ifsudestemg.eventsAPI.model.entity.Atividade;
+import br.edu.ifsudestemg.eventsAPI.model.entity.Evento;
+import br.edu.ifsudestemg.eventsAPI.model.entity.TipoAtividade;
+import br.edu.ifsudestemg.eventsAPI.model.entity.Usuario;
 import br.edu.ifsudestemg.eventsAPI.service.AtividadeService;
+import br.edu.ifsudestemg.eventsAPI.service.EventoService;
+import br.edu.ifsudestemg.eventsAPI.service.UsuarioService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -21,6 +27,8 @@ import java.util.stream.Collectors;
 public class AtividadeController {
 
     private final AtividadeService service;
+    private final UsuarioService usuarioService;
+    private final EventoService eventoService;
 
     @GetMapping()
     public ResponseEntity get() {
@@ -38,7 +46,7 @@ public class AtividadeController {
     }
 
     @PostMapping()
-    public ResponseEntity post(AtividadeDTO dto) {
+    public ResponseEntity post(@Valid @RequestBody AtividadeDTO dto) {
         try {
             Atividade atividade = converter(dto);
             atividade = service.salvar(atividade);
@@ -49,7 +57,7 @@ public class AtividadeController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity atualizar(@PathVariable("id") Long id, AtividadeDTO dto) {
+    public ResponseEntity atualizar(@PathVariable("id") Long id,@Valid @RequestBody AtividadeDTO dto) {
         if (!service.getAtividadesById(id).isPresent()) {
             return new ResponseEntity("Atividade não encontrada", HttpStatus.NOT_FOUND);
         }
@@ -78,8 +86,26 @@ public class AtividadeController {
     }
 
     public Atividade converter(AtividadeDTO dto) {
-        ModelMapper modelMapper = new ModelMapper();
-        Atividade atividade = modelMapper.map(dto, Atividade.class);
+        Atividade atividade = new Atividade();
+
+        atividade.setNome(dto.getNome());
+        atividade.setCancelado(dto.isCancelado());
+
+        Evento evento = eventoService
+                .getEventosById(dto.getIdEvento())
+                .orElseThrow(() -> new RegraNegocioException("Evento não encontrado"));
+
+        atividade.setEvento(evento);
+
+        Usuario ministrante = usuarioService.getUsuariosById(dto.getIdMinistrante())
+                .orElseThrow(() -> new RegraNegocioException("Ministrante não encontrado"));
+
+        atividade.setMinistrante(ministrante);
+
+        TipoAtividade tipo = new TipoAtividade();
+        tipo.setId(dto.getIdTipoAtividade());
+        atividade.setTipoAtividade(tipo);
+
         return atividade;
     }
 }
