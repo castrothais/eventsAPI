@@ -1,5 +1,6 @@
 package br.edu.ifsudestemg.eventsAPI.api.dto;
 
+import br.edu.ifsudestemg.eventsAPI.model.entity.Endereco;
 import br.edu.ifsudestemg.eventsAPI.model.entity.Evento;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,6 +23,7 @@ public class EventoDTO {
     private Integer idadeMinima;
     private Integer lotacaoMaxima;
     private boolean cancelado;
+    private Endereco endereco;
 
     private Long idOrganizador;
     private String nomeOrganizador;
@@ -35,6 +37,7 @@ public class EventoDTO {
     public static EventoDTO create(Evento evento) {
         ModelMapper modelMapper = new ModelMapper();
         EventoDTO dto = modelMapper.map(evento, EventoDTO.class);
+        dto.setEndereco(evento.getEndereco());
 
         dto.nomeOrganizador = evento.getOrganizador().getNomeUsuario();
         dto.nomeTipoEvento = evento.getTipoEvento().getNome();

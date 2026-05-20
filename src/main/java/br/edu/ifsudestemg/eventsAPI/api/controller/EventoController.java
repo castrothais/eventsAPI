@@ -2,8 +2,12 @@ package br.edu.ifsudestemg.eventsAPI.api.controller;
 
 import br.edu.ifsudestemg.eventsAPI.api.dto.EventoDTO;
 import br.edu.ifsudestemg.eventsAPI.api.exeption.RegraNegocioException;
-import br.edu.ifsudestemg.eventsAPI.model.entity.Evento;
+import br.edu.ifsudestemg.eventsAPI.model.entity.*;
 import br.edu.ifsudestemg.eventsAPI.service.EventoService;
+import br.edu.ifsudestemg.eventsAPI.service.PorteEventoService;
+import br.edu.ifsudestemg.eventsAPI.service.TipoEventoService;
+import br.edu.ifsudestemg.eventsAPI.service.UsuarioService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -20,6 +24,9 @@ import java.util.stream.Collectors;
 public class EventoController {
 
     private final EventoService service;
+    private final UsuarioService usuarioService;
+    private final TipoEventoService tipoEventoService;
+    private final PorteEventoService porteEventoService;
 
     @GetMapping()
     public ResponseEntity get() {
@@ -37,7 +44,7 @@ public class EventoController {
     }
 
     @PostMapping()
-    public ResponseEntity post(EventoDTO dto) {
+    public ResponseEntity post(@Valid @RequestBody EventoDTO dto) {
         try {
             Evento evento = converter(dto);
             evento = service.salvar(evento);
@@ -48,7 +55,7 @@ public class EventoController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity atualizar(@PathVariable("id") Long id, EventoDTO dto) {
+    public ResponseEntity atualizar(@PathVariable("id") Long id,@Valid @RequestBody EventoDTO dto) {
         if (!service.getEventosById(id).isPresent()) {
             return new ResponseEntity("Evento não encontrado", HttpStatus.NOT_FOUND);
         }
@@ -77,8 +84,37 @@ public class EventoController {
     }
 
     public Evento converter(EventoDTO dto) {
-        ModelMapper modelMapper = new ModelMapper();
-        Evento evento = modelMapper.map(dto, Evento.class);
+
+        Evento evento = new Evento();
+
+        evento.setNome(dto.getNome());
+        evento.setModalidade(Modalidade.valueOf(dto.getModalidade()));
+        evento.setDataHoraInicio(dto.getDataHoraInicio());
+        evento.setDataHoraFim(dto.getDataHoraFim());
+        evento.setDescricao(dto.getDescricao());
+        evento.setIdadeMinima(dto.getIdadeMinima());
+        evento.setLotacaoMaxima(dto.getLotacaoMaxima());
+        evento.setCancelado(dto.isCancelado());
+
+        evento.setEndereco(dto.getEndereco());
+
+
+        Usuario organizador = usuarioService
+                .getUsuariosById(dto.getIdOrganizador())
+                .orElseThrow(() -> new RegraNegocioException("Organizador não encontrado"));
+
+        TipoEvento tipoEvento = tipoEventoService
+                .getTipoEventosById(dto.getIdTipoEvento())
+                .orElseThrow(() -> new RegraNegocioException("Tipo de evento não encontrado"));
+
+        PorteEvento porteEvento = porteEventoService
+                .getPorteEventosById(dto.getIdPorteEvento())
+                .orElseThrow(() -> new RegraNegocioException("Porte de evento não encontrado"));
+
+        evento.setOrganizador(organizador);
+        evento.setTipoEvento(tipoEvento);
+        evento.setPorteEvento(porteEvento);
+
         return evento;
     }
 }
