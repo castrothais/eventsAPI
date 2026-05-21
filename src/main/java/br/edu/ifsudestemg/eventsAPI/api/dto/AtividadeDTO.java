@@ -25,9 +25,19 @@ public class AtividadeDTO {
     public static AtividadeDTO create(Atividade atividade) {
         ModelMapper modelMapper = new ModelMapper();
         AtividadeDTO dto = modelMapper.map(atividade, AtividadeDTO.class);
-        dto.nomeEvento = atividade.getEvento().getNome();
-        dto.nomeMinistrante = atividade.getMinistrante().getNomeUsuario();
-        dto.nomeTipoAtividade = atividade.getTipoAtividade().getNome();
+
+        if (atividade.getEvento() != null) {
+            dto.setNomeEvento(atividade.getEvento().getNome());
+        }
+
+        if (atividade.getMinistrante() != null) {
+            dto.setNomeMinistrante(atividade.getMinistrante().getNomeUsuario());
+        }
+
+        if (atividade.getTipoAtividade() != null) {
+            dto.setNomeTipoAtividade(atividade.getTipoAtividade().getNome());
+        }
+
         return dto;
     }
 }
