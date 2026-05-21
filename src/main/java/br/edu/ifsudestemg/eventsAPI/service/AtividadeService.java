@@ -2,7 +2,10 @@ package br.edu.ifsudestemg.eventsAPI.service;
 
 import br.edu.ifsudestemg.eventsAPI.api.exeption.RegraNegocioException;
 import br.edu.ifsudestemg.eventsAPI.model.entity.Atividade;
+import br.edu.ifsudestemg.eventsAPI.model.entity.Perfil;
 import br.edu.ifsudestemg.eventsAPI.model.repository.AtividadeRepository;
+import org.modelmapper.ModelMapper;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,9 +50,25 @@ public class AtividadeService {
         if (!nomeTrim.matches(".*[a-zA-ZÀ-ÿ].*")) {
             throw new RegraNegocioException("Nome deve conter letras válidas");
         }
+        if (atividade.getEvento() == null) {
+            throw new RegraNegocioException("Evento é obrigatório");
+        }
+
+        if (atividade.getMinistrante() == null) {
+            throw new RegraNegocioException("Ministrante é obrigatório");
+        }
+
+        if (atividade.getMinistrante().getPerfis() == null ||
+                !atividade.getMinistrante().getPerfis().contains(Perfil.MEDIADOR)) {
+            throw new RegraNegocioException("Usuário não possui perfil MEDIADOR");
+        }
 
         if (atividade.getId() == null && repository.existsByNomeIgnoreCaseAndEventoId(atividade.getNome(), atividade.getEvento().getId())) {
             throw new RegraNegocioException("Já existe uma atividade com esse nome");
+        }
+
+        if (atividade.getEvento().getDataHoraFim() == null) {
+            throw new RegraNegocioException("Evento sem data de término definida");
         }
 
         if (LocalDateTime.now().isAfter(atividade.getEvento().getDataHoraFim())){
@@ -59,6 +78,8 @@ public class AtividadeService {
         if(atividade.isCancelado()) {
             validarCancelamentoAtividade(atividade);
         }
+
+
     }
 
     public void validarCancelamentoAtividade(Atividade atividade) {
@@ -68,5 +89,10 @@ public class AtividadeService {
         if (repository.countByEventoId(atividade.getEvento().getId()) <= 1 && !atividade.getEvento().isCancelado()) {
             throw new RegraNegocioException("Evento ativo deve possuir ao menos uma atividade");
         }
+    }
+
+    @Bean
+    public ModelMapper modelMapper() {
+        return new ModelMapper();
     }
 }
