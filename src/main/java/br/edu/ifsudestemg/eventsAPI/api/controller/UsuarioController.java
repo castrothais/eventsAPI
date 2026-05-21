@@ -2,6 +2,7 @@ package br.edu.ifsudestemg.eventsAPI.api.controller;
 
 import br.edu.ifsudestemg.eventsAPI.api.dto.UsuarioDTO;
 import br.edu.ifsudestemg.eventsAPI.api.exeption.RegraNegocioException;
+import br.edu.ifsudestemg.eventsAPI.model.entity.Perfil;
 import br.edu.ifsudestemg.eventsAPI.model.entity.Usuario;
 import br.edu.ifsudestemg.eventsAPI.model.entity.UsuarioPessoaFisica;
 import br.edu.ifsudestemg.eventsAPI.model.entity.UsuarioPessoaJuridica;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -96,18 +98,33 @@ public class UsuarioController {
     }
 
     public Usuario converter(UsuarioDTO dto) {
-
         ModelMapper modelMapper = new ModelMapper();
 
         if (dto.getTipoUsuario() == null) {
             throw new RegraNegocioException("Tipo de usuário é obrigatório");
         }
 
-        return switch (dto.getTipoUsuario()) {
+        Usuario usuario = switch (dto.getTipoUsuario()) {
 
             case PF -> modelMapper.map(dto, UsuarioPessoaFisica.class);
 
             case PJ -> modelMapper.map(dto, UsuarioPessoaJuridica.class);
         };
+
+        if (dto.getPerfis() != null && !dto.getPerfis().isEmpty()) {
+
+            usuario.setPerfis(
+                    dto.getPerfis()
+                            .stream()
+                            .map(Perfil::valueOf)
+                            .collect(java.util.stream.Collectors.toList())
+            );
+
+        } else {
+            usuario.setPerfis(List.of(Perfil.PARTICIPANTE));
+        }
+
+        return usuario;
+
     }
 }
