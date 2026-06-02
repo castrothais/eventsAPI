@@ -2,11 +2,12 @@ package br.edu.ifsudestemg.eventsAPI.api.controller;
 
 import br.edu.ifsudestemg.eventsAPI.api.dto.IngressoDTO;
 import br.edu.ifsudestemg.eventsAPI.api.exeption.RegraNegocioException;
-import br.edu.ifsudestemg.eventsAPI.model.entity.Ingresso;
+import br.edu.ifsudestemg.eventsAPI.model.entity.*;
+import br.edu.ifsudestemg.eventsAPI.service.EventoService;
 import br.edu.ifsudestemg.eventsAPI.service.IngressoService;
+import br.edu.ifsudestemg.eventsAPI.service.UsuarioService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,8 @@ import java.util.stream.Collectors;
 public class IngressoController {
 
     private final IngressoService service;
+    private final EventoService eventoService;
+    private final UsuarioService usuarioService;
 
     @GetMapping()
     public ResponseEntity get() {
@@ -64,8 +67,21 @@ public class IngressoController {
     }
 
     public Ingresso converter(IngressoDTO dto) {
-        ModelMapper modelMapper = new ModelMapper();
-        Ingresso ingresso = modelMapper.map(dto, Ingresso.class);
+        Ingresso ingresso = new Ingresso();
+        ingresso.setStatus(StatusIngresso.valueOf(dto.getStatus()));
+        ingresso.setTaxa(dto.getTaxa());
+        ingresso.setValor(dto.getValor());
+
+        Usuario participante = usuarioService.getUsuariosById(dto.getIdParticipante())
+                .orElseThrow(() -> new RegraNegocioException("Participante não encontrado"));
+        ingresso.setParticipante(participante);
+
+        Evento evento = eventoService
+                .getEventosById(dto.getIdEvento())
+                .orElseThrow(() -> new RegraNegocioException("Evento não encontrado"));
+
+        ingresso.setEvento(evento);
+
         return ingresso;
     }
 }
