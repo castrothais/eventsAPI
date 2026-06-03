@@ -4,7 +4,12 @@ import br.edu.ifsudestemg.eventsAPI.api.dto.PresencaDTO;
 import br.edu.ifsudestemg.eventsAPI.api.exeption.RegraNegocioException;
 import br.edu.ifsudestemg.eventsAPI.model.entity.Presenca;
 import br.edu.ifsudestemg.eventsAPI.service.PresencaService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,18 +22,29 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1/presencas")
 @RequiredArgsConstructor
+@Tag(name = "Presença", description = "API de Presenças")
 public class PresencaController {
 
     private final PresencaService service;
 
     @GetMapping()
+    @Operation(summary = "Obter presenças")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Presenças encontradas"),
+            @ApiResponse(responseCode = "404", description = "Nenhuma presença encontrada")
+    })
     public ResponseEntity get() {
         List<Presenca> presencas = service.getPresencas();
         return ResponseEntity.ok(presencas.stream().map(PresencaDTO::create).collect(Collectors.toList()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity get(@PathVariable("id") Long id) {
+    @Operation(summary = "Obter informações de uma presença")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Presença encontrada"),
+            @ApiResponse(responseCode = "404", description = "Presença não encontrada")
+    })
+    public ResponseEntity get(@PathVariable("id") @Parameter(description = "Id da presença") Long id) {
         Optional<Presenca> presenca = service.getPresencasById(id);
         if (!presenca.isPresent()) {
             return new ResponseEntity("Presença não encontrada", HttpStatus.NOT_FOUND);
@@ -37,6 +53,11 @@ public class PresencaController {
     }
 
     @PostMapping()
+    @Operation(summary = "Salvar presença")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Presença salva com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Falha ao salvar presença")
+    })
     public ResponseEntity post(PresencaDTO dto) {
         try {
             Presenca presenca = converter(dto);
@@ -48,7 +69,12 @@ public class PresencaController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity atualizar(@PathVariable("id") Long id, PresencaDTO dto) {
+    @Operation(summary = "Atualizar presença")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Presença atualizada com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Falha ao atualizar presença")
+    })
+    public ResponseEntity atualizar(@PathVariable("id") @Parameter(description = "Id da presença") Long id, PresencaDTO dto) {
         if (!service.getPresencasById(id).isPresent()) {
             return new ResponseEntity("Presença não encontrada", HttpStatus.NOT_FOUND);
         }
@@ -63,7 +89,12 @@ public class PresencaController {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity excluir(@PathVariable("id") Long id) {
+    @Operation(summary = "Obter informações de uma presença")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Presença excluída com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Falha ao excluir presença")
+    })
+    public ResponseEntity excluir(@PathVariable("id") @Parameter(description = "Id da presença") Long id) {
         Optional<Presenca> presenca = service.getPresencasById(id);
         if (!presenca.isPresent()) {
             return new ResponseEntity("Presença não encontrada", HttpStatus.NOT_FOUND);

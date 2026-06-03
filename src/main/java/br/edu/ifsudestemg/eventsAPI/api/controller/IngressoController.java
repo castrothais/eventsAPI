@@ -6,6 +6,11 @@ import br.edu.ifsudestemg.eventsAPI.model.entity.*;
 import br.edu.ifsudestemg.eventsAPI.service.EventoService;
 import br.edu.ifsudestemg.eventsAPI.service.IngressoService;
 import br.edu.ifsudestemg.eventsAPI.service.UsuarioService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,6 +24,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1/ingressos")
 @RequiredArgsConstructor
+@Tag(name = "Ingresso", description = "API de Ingressos")
 public class IngressoController {
 
     private final IngressoService service;
@@ -26,13 +32,23 @@ public class IngressoController {
     private final UsuarioService usuarioService;
 
     @GetMapping()
+    @Operation(summary = "Obter ingressos")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ingressos encontrados"),
+            @ApiResponse(responseCode = "404", description = "Nenhum ingresso encontrado")
+    })
     public ResponseEntity get() {
         List<Ingresso> ingressos = service.getIngressos();
         return ResponseEntity.ok(ingressos.stream().map(IngressoDTO::create).collect(Collectors.toList()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity get(@PathVariable("id") Long id) {
+    @Operation(summary = "Obter informações de um ingresso")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ingresso encontrado"),
+            @ApiResponse(responseCode = "404", description = "Ingresso não encontrado")
+    })
+    public ResponseEntity get( @PathVariable("id") @Parameter(description = "Id do ingresso") Long id) {
         Optional<Ingresso> ingresso = service.getIngressosById(id);
         if (!ingresso.isPresent()) {
             return new ResponseEntity("Ingresso não encontrado", HttpStatus.NOT_FOUND);
@@ -41,6 +57,11 @@ public class IngressoController {
     }
 
     @PostMapping()
+    @Operation(summary = "Salvar ingresso")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Ingresso salvo com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Falha ao salvar ingresso")
+    })
     public ResponseEntity post(@Valid @RequestBody IngressoDTO dto) {
         try {
             Ingresso ingresso = converter(dto);
@@ -52,7 +73,12 @@ public class IngressoController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity atualizar(@PathVariable("id") Long id, @Valid @RequestBody IngressoDTO dto) {
+    @Operation(summary = "Atualizar dados de ingresso")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ingresso atualizado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Falha ao atualizar ingresso")
+    })
+    public ResponseEntity atualizar( @PathVariable("id") @Parameter(description = "Id do ingresso") Long id, @Valid @RequestBody IngressoDTO dto) {
         if (!service.getIngressosById(id).isPresent()) {
             return new ResponseEntity("Ingresso não encontrado", HttpStatus.NOT_FOUND);
         }

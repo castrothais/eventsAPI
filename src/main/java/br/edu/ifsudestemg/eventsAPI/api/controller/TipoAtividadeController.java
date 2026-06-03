@@ -5,8 +5,13 @@ import br.edu.ifsudestemg.eventsAPI.api.dto.TipoAtividadeDTO;
 import br.edu.ifsudestemg.eventsAPI.api.exeption.RegraNegocioException;
 import br.edu.ifsudestemg.eventsAPI.model.entity.TipoAtividade;
 import br.edu.ifsudestemg.eventsAPI.service.TipoAtividadeService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,18 +24,28 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1/tipoAtividade")
 @RequiredArgsConstructor
-
+@Tag(name = "Tipo de Atividade", description = "API de tipos de atividade")
 public class TipoAtividadeController {
     private final TipoAtividadeService service;
 
     @GetMapping()
+    @Operation(summary = "Obter tipos de atividade")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Tipos de atividade encontradas"),
+            @ApiResponse(responseCode = "404", description = "Nenhum tipo de atividade encontrado")
+    })
     public ResponseEntity get() {
         List<TipoAtividade> TipoAtividades = service.getTipoAtividades();
         return ResponseEntity.ok(TipoAtividades.stream().map(TipoAtividadeDTO::create).collect(Collectors.toList()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity get(@PathVariable("id") Long id) {
+    @Operation(summary = "Obter informações de um tipo de atividade")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Tipos de atividade encontrada"),
+            @ApiResponse(responseCode = "404", description = "Nenhuma presença encontrado")
+    })
+    public ResponseEntity get(@PathVariable("id") @Parameter(description = "Id do tipo de atividade") Long id) {
         Optional<TipoAtividade> TipoAtividade = service.getTipoAtividadesById(id);
         if (!TipoAtividade.isPresent()) {
             return new ResponseEntity("Tipo de atividade não encontrada", HttpStatus.NOT_FOUND);
@@ -39,6 +54,11 @@ public class TipoAtividadeController {
     }
 
     @PostMapping()
+    @Operation(summary = "Salvar tipo de atividade")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Tipo de atividade salvo com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Falha ao salvar tipo de atividade")
+    })
     public ResponseEntity post(@Valid @RequestBody TipoAtividadeDTO dto) {
         try {
             TipoAtividade tipoAtividade = converter(dto);
@@ -50,7 +70,12 @@ public class TipoAtividadeController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity atualizar(@PathVariable("id") Long id,@Valid @RequestBody TipoAtividadeDTO dto) {
+    @Operation(summary = "Atualizar tipo de atividade")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Tipo de atividade atualizar com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Falha ao salvar tipo de atividade")
+    })
+    public ResponseEntity atualizar(@PathVariable("id") @Parameter(description = "Id do tipo de atividade") Long id,@Valid @RequestBody TipoAtividadeDTO dto) {
         if (!service.getTipoAtividadesById(id).isPresent()) {
             return new ResponseEntity("Tipo atividade não encontrada", HttpStatus.NOT_FOUND);
         }
@@ -65,7 +90,12 @@ public class TipoAtividadeController {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity excluir(@PathVariable("id") Long id) {
+    @Operation(summary = "Excluir tipo de atividade")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Tipo de atividade excluído com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Falha ao excluir tipo de atividade")
+    })
+    public ResponseEntity excluir(@PathVariable("id") @Parameter(description = "Id do tipo de atividade") Long id) {
         Optional<TipoAtividade> tipoAtividade = service.getTipoAtividadesById(id);
         if (!tipoAtividade.isPresent()) {
             return new ResponseEntity("Tipo atividade não encontrada", HttpStatus.NOT_FOUND);

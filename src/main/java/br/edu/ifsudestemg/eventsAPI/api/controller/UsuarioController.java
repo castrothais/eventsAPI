@@ -7,8 +7,13 @@ import br.edu.ifsudestemg.eventsAPI.model.entity.Usuario;
 import br.edu.ifsudestemg.eventsAPI.model.entity.UsuarioPessoaFisica;
 import br.edu.ifsudestemg.eventsAPI.model.entity.UsuarioPessoaJuridica;
 import br.edu.ifsudestemg.eventsAPI.service.UsuarioService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,24 +21,34 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/usuario")
 @RequiredArgsConstructor
+@Tag(name = "Usuário", description = "API de usuário")
 public class UsuarioController {
 
     private final UsuarioService service;
 
     @GetMapping()
+    @Operation(summary = "Obter usuários")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuários encontradas"),
+            @ApiResponse(responseCode = "404", description = "Nenhum usuário encontrado")
+    })
     public ResponseEntity get() {
         List<Usuario> usuarios = service.getUsuarios();
         return ResponseEntity.ok(usuarios.stream().map(UsuarioDTO::create).collect(Collectors.toList()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity get(@PathVariable("id") Long id) {
+    @Operation(summary = "Obter informações de um usuário")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuário encontrado"),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
+    })
+    public ResponseEntity get( @PathVariable("id") @Parameter(description = "Id do usuário") Long id) {
         Optional<Usuario> usuario = service.getUsuariosById(id);
         if (!usuario.isPresent()) {
             return new ResponseEntity("Usuario não encontrado", HttpStatus.NOT_FOUND);
@@ -42,6 +57,11 @@ public class UsuarioController {
     }
 
     @PostMapping()
+    @Operation(summary = "Salvar usuário")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Usuário salvo com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Falha ao salvar usuário")
+    })
     public ResponseEntity post(@Valid @RequestBody UsuarioDTO dto) {
         try {
 
@@ -58,10 +78,12 @@ public class UsuarioController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity atualizar(
-            @PathVariable("id") Long id,
-           @Valid @RequestBody UsuarioDTO dto
-    ) {
+    @Operation(summary = "Atualizar dados de usuário")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuário atualizado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Falha ao atualizar usuário")
+    })
+    public ResponseEntity atualizar( @PathVariable("id") @Parameter(description = "Id do usuário") Long id, @Valid @RequestBody UsuarioDTO dto ) {
 
         if (!service.getUsuariosById(id).isPresent()) {
             return new ResponseEntity("Usuario não encontrado", HttpStatus.NOT_FOUND);
@@ -84,7 +106,12 @@ public class UsuarioController {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity excluir(@PathVariable("id") Long id) {
+    @Operation(summary = "Excluir usuário")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Usuário excluído com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Falha ao excluir usuário")
+    })
+    public ResponseEntity excluir(@PathVariable("id") @Parameter(description = "Id do usuário") Long id) {
         Optional<Usuario> usuario = service.getUsuariosById(id);
         if (!usuario.isPresent()) {
             return new ResponseEntity("Usuario não encontrado", HttpStatus.NOT_FOUND);
