@@ -32,6 +32,9 @@ public class Ingresso {
     @DecimalMin(value = "0.0")
     private BigDecimal taxa;
 
+    @Column(name = "tipo_ingresso")
+    private String tipoIngresso;
+
     @NotNull(message = "O ingresso deve estar associada a um participante")
     @ManyToOne
     private Usuario participante;
