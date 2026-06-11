@@ -29,6 +29,8 @@ public class IngressoDTO {
     private Long idEvento;
     private String nomeEvento;
 
+    private String tipoIngresso;
+
     public static IngressoDTO create(Ingresso ingresso) {
         ModelMapper modelMapper = new ModelMapper();
         IngressoDTO dto = modelMapper.map(ingresso, IngressoDTO.class);

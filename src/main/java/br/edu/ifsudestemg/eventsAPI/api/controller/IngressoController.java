@@ -1,6 +1,7 @@
 package br.edu.ifsudestemg.eventsAPI.api.controller;
 
 import br.edu.ifsudestemg.eventsAPI.api.dto.IngressoDTO;
+import br.edu.ifsudestemg.eventsAPI.api.dto.PagamentoIngressoDTO;
 import br.edu.ifsudestemg.eventsAPI.api.exeption.RegraNegocioException;
 import br.edu.ifsudestemg.eventsAPI.model.entity.*;
 import br.edu.ifsudestemg.eventsAPI.service.EventoService;
@@ -49,6 +50,26 @@ public class IngressoController {
         } catch (RegraNegocioException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+    @PatchMapping("/{id}/pagamento")
+    public ResponseEntity pagarIngresso(
+            @PathVariable Long id,
+            @RequestBody PagamentoIngressoDTO dto) {
+
+        Optional<Ingresso> ingressoOpt = service.getIngressosById(id);
+
+        if (ingressoOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Ingresso ingresso = ingressoOpt.get();
+        ingresso.setTipoIngresso(dto.getTipoIngresso());
+        ingresso.setValor(dto.getValor());
+        ingresso.setStatus(StatusIngresso.PAGO);
+
+        service.salvar(ingresso);
+
+        return ResponseEntity.ok(IngressoDTO.create(ingresso));
     }
 
     @PutMapping("{id}")
