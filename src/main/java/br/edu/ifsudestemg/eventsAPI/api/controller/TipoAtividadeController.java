@@ -24,14 +24,14 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1/tipoAtividade")
 @RequiredArgsConstructor
-@Tag(name = "Tipo de Atividade", description = "API de tipos de atividade")
+@Tag(name = "Tipo de Atividade", description = "API de Tipos de atividade")
 public class TipoAtividadeController {
     private final TipoAtividadeService service;
 
     @GetMapping()
     @Operation(summary = "Obter tipos de atividade")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Tipos de atividade encontradas"),
+            @ApiResponse(responseCode = "200", description = "Tipos de atividade encontrados"),
             @ApiResponse(responseCode = "404", description = "Nenhum tipo de atividade encontrado")
     })
     public ResponseEntity get() {
@@ -42,8 +42,8 @@ public class TipoAtividadeController {
     @GetMapping("/{id}")
     @Operation(summary = "Obter informações de um tipo de atividade")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Tipos de atividade encontrada"),
-            @ApiResponse(responseCode = "404", description = "Nenhuma presença encontrado")
+            @ApiResponse(responseCode = "200", description = "Tipos de atividade encontrado"),
+            @ApiResponse(responseCode = "404", description = "Nenhum tipo de atividade encontrado")
     })
     public ResponseEntity get(@PathVariable("id") @Parameter(description = "Id do tipo de atividade") Long id) {
         Optional<TipoAtividade> TipoAtividade = service.getTipoAtividadesById(id);
@@ -72,8 +72,8 @@ public class TipoAtividadeController {
     @PutMapping("{id}")
     @Operation(summary = "Atualizar tipo de atividade")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Tipo de atividade atualizar com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Falha ao salvar tipo de atividade")
+            @ApiResponse(responseCode = "201", description = "Tipo de atividade atualizado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Falha ao atualizar tipo de atividade")
     })
     public ResponseEntity atualizar(@PathVariable("id") @Parameter(description = "Id do tipo de atividade") Long id,@Valid @RequestBody TipoAtividadeDTO dto) {
         if (!service.getTipoAtividadesById(id).isPresent()) {
@@ -90,7 +90,7 @@ public class TipoAtividadeController {
     }
 
     @DeleteMapping("{id}")
-    @Operation(summary = "Excluir tipo de atividade")
+    @Operation(summary = "Excluir ipo de atividade")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Tipo de atividade excluído com sucesso"),
             @ApiResponse(responseCode = "404", description = "Falha ao excluir tipo de atividade")

@@ -74,8 +74,14 @@ public class IngressoController {
     }
 
     @PatchMapping("/{id}/pagamento")
+    @Operation(summary = "Pagar ingresso")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ingresso pago com sucesso")
+    })
     public ResponseEntity pagarIngresso(
-            @PathVariable Long id,
+            @PathVariable("id")
+            @Parameter(description = "Id do ingresso")
+            Long id,
             @RequestBody PagamentoIngressoDTO dto) {
 
         Optional<Ingresso> ingressoOpt = service.getIngressosById(id);
@@ -97,7 +103,7 @@ public class IngressoController {
     @Operation(summary = "Atualizar dados de ingresso")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ingresso atualizado com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Falha ao atualizar ingresso")
+            @ApiResponse(responseCode = "404", description = "Ingresso não encontrado")
     })
     public ResponseEntity atualizar( @PathVariable("id") @Parameter(description = "Id do ingresso") Long id, @Valid @RequestBody IngressoDTO dto) {
         if (!service.getIngressosById(id).isPresent()) {

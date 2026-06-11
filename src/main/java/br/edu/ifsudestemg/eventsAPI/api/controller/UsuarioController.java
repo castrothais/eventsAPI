@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1/usuario")
 @RequiredArgsConstructor
-@Tag(name = "Usuário", description = "API de usuário")
+@Tag(name = "Usuário", description = "API de Usuário")
 public class UsuarioController {
 
     private final UsuarioService service;
@@ -34,7 +34,7 @@ public class UsuarioController {
     @GetMapping()
     @Operation(summary = "Obter usuários")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Usuários encontradas"),
+            @ApiResponse(responseCode = "200", description = "Usuários encontrados"),
             @ApiResponse(responseCode = "404", description = "Nenhum usuário encontrado")
     })
     public ResponseEntity get() {
@@ -60,7 +60,7 @@ public class UsuarioController {
     @Operation(summary = "Salvar usuário")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Usuário salvo com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Falha ao salvar usuário")
+            @ApiResponse(responseCode = "400", description = "Dados inválidos ou regra de negócio violada para usuário")
     })
     public ResponseEntity post(@Valid @RequestBody UsuarioDTO dto) {
         try {
@@ -72,7 +72,6 @@ public class UsuarioController {
             return new ResponseEntity(usuario, HttpStatus.CREATED);
 
         } catch (RegraNegocioException e) {
-
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
