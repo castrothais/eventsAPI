@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -24,6 +25,7 @@ public class EventoDTO {
     private Integer lotacaoMaxima;
     private boolean cancelado;
     private Endereco endereco;
+    private BigDecimal valorIngresso;
 
     private Long idOrganizador;
     private String nomeOrganizador;
