@@ -95,6 +95,7 @@ public class EventoController {
         evento.setIdadeMinima(dto.getIdadeMinima());
         evento.setLotacaoMaxima(dto.getLotacaoMaxima());
         evento.setCancelado(dto.isCancelado());
+        evento.setValorIngresso(dto.getValorIngresso());
 
         evento.setEndereco(dto.getEndereco());
 

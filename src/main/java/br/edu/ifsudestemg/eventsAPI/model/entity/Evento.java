@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -50,6 +51,10 @@ public class Evento {
     @NotNull(message = "O evento deve estar associada a um endereço")
     @Embedded
     private Endereco endereco;
+
+    @NotNull(message = "Valor do ingresso obrigatório")
+    @DecimalMin(value = "0.0")
+    private BigDecimal valorIngresso;
 
     @NotNull
     private boolean cancelado = false;
