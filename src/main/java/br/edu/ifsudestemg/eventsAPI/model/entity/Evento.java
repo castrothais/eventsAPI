@@ -23,6 +23,8 @@ public class Evento {
     @Size(min = 1, max = 255, message = "Nome do evento deve ter entre 1 e 255 caracteres")
     private String nome;
 
+    private String imagem;
+
     @NotNull(message = "Modalidade obrigatória")
     @Enumerated(EnumType.STRING)
     private Modalidade modalidade;
