@@ -14,12 +14,19 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -111,6 +118,64 @@ EventoController {
             return new ResponseEntity(HttpStatus.NO_CONTENT);
         } catch (RegraNegocioException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/{id}/upload")
+    public ResponseEntity<?> uploadImagem(
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file) {
+
+        try {
+
+            Evento evento = service.getEventosById(id)
+                    .orElseThrow(() ->
+                            new RegraNegocioException("Evento não encontrado"));
+
+            String nomeArquivo =
+                    UUID.randomUUID() + "_" + file.getOriginalFilename();
+
+            Path pastaUpload =
+                    Paths.get("uploads/eventos");
+
+            Files.createDirectories(pastaUpload);
+
+            Path caminho =
+                    pastaUpload.resolve(nomeArquivo);
+
+            Files.copy(file.getInputStream(), caminho);
+
+            evento.setImagem(nomeArquivo);
+
+            service.salvar(evento);
+
+            return ResponseEntity.ok(nomeArquivo);
+
+        } catch (Exception e) {
+
+            return ResponseEntity.badRequest()
+                    .body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/imagem/{nomeArquivo}")
+    public ResponseEntity<Resource> buscarImagem(
+            @PathVariable String nomeArquivo) {
+
+        try {
+
+            Path caminho =
+                    Paths.get("uploads/eventos")
+                            .resolve(nomeArquivo);
+
+            Resource resource =
+                    new UrlResource(caminho.toUri());
+
+            return ResponseEntity.ok(resource);
+
+        } catch (Exception e) {
+
+            return ResponseEntity.notFound().build();
         }
     }
 

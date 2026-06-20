@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 public class EventoDTO {
     private Long id;
     private String nome;
+    private String imagem;
     private String modalidade;
     private LocalDateTime dataHoraInicio;
     private LocalDateTime dataHoraFim;
