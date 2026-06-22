@@ -1,5 +1,9 @@
 package br.edu.ifsudestemg.eventsAPI.api.controller;
 
+import br.edu.ifsudestemg.eventsAPI.api.dto.CredenciaisDTO;
+import br.edu.ifsudestemg.eventsAPI.api.dto.TokenDTO;
+import br.edu.ifsudestemg.eventsAPI.api.exeption.SenhaInvalidaException;
+import br.edu.ifsudestemg.eventsAPI.security.JwtService;
 import br.edu.ifsudestemg.eventsAPI.api.dto.UsuarioDTO;
 import br.edu.ifsudestemg.eventsAPI.api.exeption.RegraNegocioException;
 import br.edu.ifsudestemg.eventsAPI.model.entity.Perfil;
@@ -17,6 +21,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,6 +36,7 @@ import java.util.stream.Collectors;
 public class UsuarioController {
 
     private final UsuarioService service;
+    private final JwtService jwtService;
 
     @GetMapping()
     @Operation(summary = "Obter usuários")
@@ -152,5 +159,25 @@ public class UsuarioController {
 
         return usuario;
 
+    }
+
+    @PutMapping("/auth")
+    @Operation(summary = "Autenticar usuário (Sign In)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Autenticação realizada com sucesso"),
+            @ApiResponse(responseCode = "401", description = "Credenciais inválidas")
+    })
+    public ResponseEntity<?> autenticar(@RequestBody CredenciaisDTO credenciaisDTO){
+        try {
+            UserDetails details = service.loadUserByUsername(credenciaisDTO.getEmail());
+            Usuario usuario = (Usuario) details;
+
+            UserDetails usuarioAutenticado = service.autenticar(usuario);
+            String token = jwtService.gerarToken(usuario);
+
+            return ResponseEntity.ok(new TokenDTO(usuario.getEmail(), token));
+        } catch (UsernameNotFoundException | SenhaInvalidaException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email ou senha inválidos");
+        }
     }
 }
