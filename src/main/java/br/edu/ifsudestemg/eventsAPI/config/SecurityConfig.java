@@ -4,6 +4,10 @@ import br.edu.ifsudestemg.eventsAPI.security.JwtAuthFilter;
 import br.edu.ifsudestemg.eventsAPI.security.JwtService;
 import br.edu.ifsudestemg.eventsAPI.service.UsuarioService;
 
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -93,9 +97,12 @@ public class SecurityConfig  {
 
                         .requestMatchers(HttpMethod.GET, "/api/v1/usuario/**")
                         .hasAnyRole("ADMINISTRADOR","ORGANIZADOR","MEDIADOR","PARTICIPANTE")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/usuario/**")
+                        .permitAll()
                         //.requestMatchers("/api/v1/usuario/**")
                         //.hasAnyRole("ADMINISTRADOR","ORGANIZADOR","MEDIADOR")
 
+                        .requestMatchers("/api/v1/usuario/auth").permitAll()
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())

@@ -120,4 +120,9 @@ public class UsuarioService implements UserDetailsService{
                 .roles(roles)
                 .build();
     }
+
+    public Usuario buscarPorEmail(String email){
+        return repository.findByEmail(email)
+                .orElseThrow(()-> new UsernameNotFoundException("Usuário não encontrado"));
+    }
 }

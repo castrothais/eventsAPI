@@ -161,7 +161,7 @@ public class UsuarioController {
 
     }
 
-    @PutMapping("/auth")
+    @PostMapping("/auth")
     @Operation(summary = "Autenticar usuário (Sign In)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Autenticação realizada com sucesso"),
@@ -169,13 +169,13 @@ public class UsuarioController {
     })
     public ResponseEntity<?> autenticar(@RequestBody CredenciaisDTO credenciaisDTO){
         try {
-            UserDetails details = service.loadUserByUsername(credenciaisDTO.getEmail());
-            Usuario usuario = (Usuario) details;
+            Usuario usuario = service.buscarPorEmail(credenciaisDTO.getEmail());
 
             UserDetails usuarioAutenticado = service.autenticar(usuario);
             String token = jwtService.gerarToken(usuario);
 
             return ResponseEntity.ok(new TokenDTO(usuario.getEmail(), token));
+
         } catch (UsernameNotFoundException | SenhaInvalidaException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email ou senha inválidos");
         }
