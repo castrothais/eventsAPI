@@ -23,6 +23,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,6 +39,7 @@ public class UsuarioController {
 
     private final UsuarioService service;
     private final JwtService jwtService;
+    private PasswordEncoder passwordEncoder;
 
     @GetMapping()
     @Operation(summary = "Obter usuários")
@@ -71,11 +74,19 @@ public class UsuarioController {
     })
     public ResponseEntity post(@Valid @RequestBody UsuarioDTO dto) {
         try {
-
+            if (dto.getSenha() == null || dto.getSenha().trim().equals("")) {
+                return ResponseEntity.badRequest().body("Senha inválida");
+            }
             Usuario usuario = converter(dto);
-
+            System.out.println(dto.getSenha());
+            System.out.println(passwordEncoder);
+            //String senhaCriptografada = passwordEncoder.encode(dto.getSenha());
+            String senhaCriptografada = new BCryptPasswordEncoder().encode(dto.getSenha());
+            System.out.println("3");
+            usuario.setSenha(senhaCriptografada);
+            System.out.println("4");
             usuario = service.salvar(usuario);
-
+            System.out.println("5");
             return new ResponseEntity(usuario, HttpStatus.CREATED);
 
         } catch (RegraNegocioException e) {
@@ -96,15 +107,19 @@ public class UsuarioController {
         }
 
         try {
-
+            if (dto.getSenha() == null || dto.getSenha().trim().equals("")) {
+                return ResponseEntity.badRequest().body("Senha inválida");
+            }
             Usuario usuario = converter(dto);
 
-            usuario.setId(id);
+            //String senhaCriptografada = passwordEncoder.encode(dto.getSenha());
+            String senhaCriptografada = new BCryptPasswordEncoder().encode(dto.getSenha());
+            usuario.setSenha(senhaCriptografada);
 
-            service.salvar(usuario);
+            usuario.setId(id);
+            usuario = service.salvar(usuario);
 
             return ResponseEntity.ok(usuario);
-
         } catch (RegraNegocioException e) {
 
             return ResponseEntity.badRequest().body(e.getMessage());
