@@ -23,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,6 +38,7 @@ public class UsuarioController {
 
     private final UsuarioService service;
     private final JwtService jwtService;
+    private PasswordEncoder passwordEncoder;
 
     @GetMapping()
     @Operation(summary = "Obter usuários")
@@ -71,8 +73,13 @@ public class UsuarioController {
     })
     public ResponseEntity post(@Valid @RequestBody UsuarioDTO dto) {
         try {
-
+            if (dto.getSenha() == null || dto.getSenha().trim().equals("")) {
+                return ResponseEntity.badRequest().body("Senha inválida");
+            }
             Usuario usuario = converter(dto);
+
+            String senhaCriptografada = passwordEncoder.encode(dto.getSenha());
+            usuario.setSenha(senhaCriptografada);
 
             usuario = service.salvar(usuario);
 
@@ -96,12 +103,16 @@ public class UsuarioController {
         }
 
         try {
-
+            if (dto.getSenha() == null || dto.getSenha().trim().equals("")) {
+                return ResponseEntity.badRequest().body("Senha inválida");
+            }
             Usuario usuario = converter(dto);
 
-            usuario.setId(id);
+            String senhaCriptografada = passwordEncoder.encode(dto.getSenha());
+            usuario.setSenha(senhaCriptografada);
 
-            service.salvar(usuario);
+            usuario.setId(id);
+            usuario = service.salvar(usuario);
 
             return ResponseEntity.ok(usuario);
 
