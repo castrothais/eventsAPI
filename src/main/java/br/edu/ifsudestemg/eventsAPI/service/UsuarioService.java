@@ -93,9 +93,11 @@ public class UsuarioService implements UserDetailsService{
         }
     }
 
-    public UserDetails autenticar(Usuario usuario){
-        UserDetails user = loadUserByUsername(usuario.getEmail());
-        boolean senhasBatem = encoder.matches(usuario.getSenha(), user.getPassword());
+    public UserDetails autenticar(String senha, String email){
+        //UserDetails user = loadUserByUsername(usuario.getEmail());
+        //boolean senhasBatem = encoder.matches(usuario.getSenha(), user.getPassword());
+        UserDetails user = loadUserByUsername(email);
+        boolean senhasBatem = encoder.matches(senha, user.getPassword());
 
         if (senhasBatem){
             return user;

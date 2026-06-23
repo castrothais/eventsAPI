@@ -78,15 +78,14 @@ public class UsuarioController {
                 return ResponseEntity.badRequest().body("Senha inválida");
             }
             Usuario usuario = converter(dto);
-            System.out.println(dto.getSenha());
-            System.out.println(passwordEncoder);
+
             //String senhaCriptografada = passwordEncoder.encode(dto.getSenha());
             String senhaCriptografada = new BCryptPasswordEncoder().encode(dto.getSenha());
-            System.out.println("3");
+
             usuario.setSenha(senhaCriptografada);
-            System.out.println("4");
+
             usuario = service.salvar(usuario);
-            System.out.println("5");
+
             return new ResponseEntity(usuario, HttpStatus.CREATED);
 
         } catch (RegraNegocioException e) {
@@ -186,7 +185,7 @@ public class UsuarioController {
         try {
             Usuario usuario = service.buscarPorEmail(credenciaisDTO.getEmail());
 
-            UserDetails usuarioAutenticado = service.autenticar(usuario);
+            UserDetails usuarioAutenticado = service.autenticar(credenciaisDTO.getSenha(), credenciaisDTO.getEmail());
             String token = jwtService.gerarToken(usuario);
 
             return ResponseEntity.ok(new TokenDTO(usuario.getEmail(), token));
