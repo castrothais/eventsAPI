@@ -35,7 +35,7 @@ public abstract class Usuario {
     @Embedded
     private Endereco endereco;
 
-    @ElementCollection(targetClass = Perfil.class)
+    @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     @CollectionTable(
             name = "usuario_perfil",

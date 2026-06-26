@@ -1,5 +1,9 @@
 package br.edu.ifsudestemg.eventsAPI.api.controller;
 
+import br.edu.ifsudestemg.eventsAPI.api.dto.CredenciaisDTO;
+import br.edu.ifsudestemg.eventsAPI.api.dto.TokenDTO;
+import br.edu.ifsudestemg.eventsAPI.api.exeption.SenhaInvalidaException;
+import br.edu.ifsudestemg.eventsAPI.security.JwtService;
 import br.edu.ifsudestemg.eventsAPI.api.dto.UsuarioDTO;
 import br.edu.ifsudestemg.eventsAPI.api.exeption.RegraNegocioException;
 import br.edu.ifsudestemg.eventsAPI.model.entity.Perfil;
@@ -17,6 +21,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,6 +38,8 @@ import java.util.stream.Collectors;
 public class UsuarioController {
 
     private final UsuarioService service;
+    private final JwtService jwtService;
+    private PasswordEncoder passwordEncoder;
 
     @GetMapping()
     @Operation(summary = "Obter usuários")
@@ -64,8 +74,15 @@ public class UsuarioController {
     })
     public ResponseEntity post(@Valid @RequestBody UsuarioDTO dto) {
         try {
-
+            if (dto.getSenha() == null || dto.getSenha().trim().equals("")) {
+                return ResponseEntity.badRequest().body("Senha inválida");
+            }
             Usuario usuario = converter(dto);
+
+            //String senhaCriptografada = passwordEncoder.encode(dto.getSenha());
+            String senhaCriptografada = new BCryptPasswordEncoder().encode(dto.getSenha());
+
+            usuario.setSenha(senhaCriptografada);
 
             usuario = service.salvar(usuario);
 
@@ -89,15 +106,19 @@ public class UsuarioController {
         }
 
         try {
-
+            if (dto.getSenha() == null || dto.getSenha().trim().equals("")) {
+                return ResponseEntity.badRequest().body("Senha inválida");
+            }
             Usuario usuario = converter(dto);
 
-            usuario.setId(id);
+            //String senhaCriptografada = passwordEncoder.encode(dto.getSenha());
+            String senhaCriptografada = new BCryptPasswordEncoder().encode(dto.getSenha());
+            usuario.setSenha(senhaCriptografada);
 
-            service.salvar(usuario);
+            usuario.setId(id);
+            usuario = service.salvar(usuario);
 
             return ResponseEntity.ok(usuario);
-
         } catch (RegraNegocioException e) {
 
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -152,5 +173,25 @@ public class UsuarioController {
 
         return usuario;
 
+    }
+
+    @PostMapping("/auth")
+    @Operation(summary = "Autenticar usuário (Sign In)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Autenticação realizada com sucesso"),
+            @ApiResponse(responseCode = "401", description = "Credenciais inválidas")
+    })
+    public ResponseEntity<?> autenticar(@RequestBody CredenciaisDTO credenciaisDTO){
+        try {
+            Usuario usuario = service.buscarPorEmail(credenciaisDTO.getEmail());
+
+            UserDetails usuarioAutenticado = service.autenticar(credenciaisDTO.getSenha(), credenciaisDTO.getEmail());
+            String token = jwtService.gerarToken(usuario);
+
+            return ResponseEntity.ok(new TokenDTO(usuario.getEmail(), token));
+
+        } catch (UsernameNotFoundException | SenhaInvalidaException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email ou senha inválidos");
+        }
     }
 }
