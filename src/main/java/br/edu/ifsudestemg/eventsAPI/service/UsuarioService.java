@@ -31,6 +31,9 @@ public class UsuarioService implements UserDetailsService{
     @Autowired
     private List<UsuarioValidator> validators;
 
+    @Autowired
+    private CarteiraService carteiraService;
+
     public UsuarioService(UsuarioRepository repository, List<UsuarioValidator> validators) {
         this.repository = repository;
         this.validators = validators;
@@ -47,7 +50,16 @@ public class UsuarioService implements UserDetailsService{
     @Transactional
     public Usuario salvar(Usuario usuario) {
         validar(usuario);
-        return repository.save(usuario);
+
+        boolean novoUsuario = usuario.getId() == null;
+
+        usuario = repository.save(usuario);
+
+        if (novoUsuario) {
+            carteiraService.obterOuCriarCarteira(usuario);
+        }
+
+        return usuario;
     }
 
     @Transactional
@@ -60,8 +72,6 @@ public class UsuarioService implements UserDetailsService{
         for (var validator : validators) {
             validator.validar(usuario);
         }
-
-        validarSenhaForte(usuario.getSenha());
 
         if (usuario.getId() == null && repository.existsByEmailIgnoreCase(usuario.getEmail())) {
             throw new RegraNegocioException("Email já cadastrado");

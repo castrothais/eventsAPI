@@ -23,9 +23,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,7 +39,29 @@ public class UsuarioController {
 
     private final UsuarioService service;
     private final JwtService jwtService;
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
+
+    @GetMapping("/me")
+    @Operation(summary = "Obter dados do usuário autenticado")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuário encontrado"),
+            @ApiResponse(responseCode = "401", description = "Usuário não autenticado"),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
+    })
+    public ResponseEntity<UsuarioDTO> getUsuarioAutenticado(
+            Authentication authentication) {
+
+        try {
+            Usuario usuario = service.buscarPorEmail(authentication.getName());
+
+            return ResponseEntity.ok(UsuarioDTO.create(usuario));
+
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+
 
     @GetMapping()
     @Operation(summary = "Obter usuários")
@@ -54,16 +76,29 @@ public class UsuarioController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Obter informações de um usuário")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Usuário encontrado"),
-            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
-    })
-    public ResponseEntity get( @PathVariable("id") @Parameter(description = "Id do usuário") Long id) {
+    public ResponseEntity<?> get(
+            @PathVariable("id") @Parameter(description = "Id do usuário") Long id,
+            Authentication authentication) {
+
         Optional<Usuario> usuario = service.getUsuariosById(id);
-        if (!usuario.isPresent()) {
-            return new ResponseEntity("Usuario não encontrado", HttpStatus.NOT_FOUND);
+
+        if (usuario.isEmpty()) {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(usuario.map(UsuarioDTO::create));
+
+        boolean administrador = authentication.getAuthorities()
+                .stream()
+                .anyMatch(autoridade ->
+                        autoridade.getAuthority().equals("ROLE_ADMINISTRADOR"));
+
+        boolean proprioUsuario = usuario.get().getEmail()
+                .equalsIgnoreCase(authentication.getName());
+
+        if (!administrador && !proprioUsuario) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        return ResponseEntity.ok(UsuarioDTO.create(usuario.get()));
     }
 
     @PostMapping()
@@ -74,19 +109,22 @@ public class UsuarioController {
     })
     public ResponseEntity post(@Valid @RequestBody UsuarioDTO dto) {
         try {
-            if (dto.getSenha() == null || dto.getSenha().trim().equals("")) {
+            if (dto.getSenha() == null || dto.getSenha().isBlank()) {
                 return ResponseEntity.badRequest().body("Senha inválida");
             }
+
+            service.validarSenhaForte(dto.getSenha());
+
             Usuario usuario = converter(dto);
 
-            //String senhaCriptografada = passwordEncoder.encode(dto.getSenha());
-            String senhaCriptografada = new BCryptPasswordEncoder().encode(dto.getSenha());
+            usuario.setPerfis(List.of(Perfil.PARTICIPANTE));
 
-            usuario.setSenha(senhaCriptografada);
+            usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
 
             usuario = service.salvar(usuario);
 
-            return new ResponseEntity(usuario, HttpStatus.CREATED);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(UsuarioDTO.create(usuario));
 
         } catch (RegraNegocioException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -95,50 +133,71 @@ public class UsuarioController {
 
     @PutMapping("{id}")
     @Operation(summary = "Atualizar dados de usuário")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Usuário atualizado com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Falha ao atualizar usuário")
-    })
-    public ResponseEntity atualizar( @PathVariable("id") @Parameter(description = "Id do usuário") Long id, @Valid @RequestBody UsuarioDTO dto ) {
+    public ResponseEntity<?> atualizar(
+            @PathVariable("id") Long id,
+            @Valid @RequestBody UsuarioDTO dto,
+            Authentication authentication) {
 
-        if (!service.getUsuariosById(id).isPresent()) {
-            return new ResponseEntity("Usuario não encontrado", HttpStatus.NOT_FOUND);
+        Optional<Usuario> usuarioExistenteOpt = service.getUsuariosById(id);
+
+        if (usuarioExistenteOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Usuario usuarioExistente = usuarioExistenteOpt.get();
+
+        boolean administrador = isAdministrador(authentication);
+        boolean proprioUsuario = isProprioUsuario(usuarioExistente, authentication);
+
+        if (!administrador && !proprioUsuario) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         try {
-            if (dto.getSenha() == null || dto.getSenha().trim().equals("")) {
-                return ResponseEntity.badRequest().body("Senha inválida");
-            }
             Usuario usuario = converter(dto);
 
-            //String senhaCriptografada = passwordEncoder.encode(dto.getSenha());
-            String senhaCriptografada = new BCryptPasswordEncoder().encode(dto.getSenha());
-            usuario.setSenha(senhaCriptografada);
+            usuario.setPerfis(usuarioExistente.getPerfis());
+
+            if (dto.getSenha() != null && !dto.getSenha().isBlank()) {
+                service.validarSenhaForte(dto.getSenha());
+                usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
+            } else {
+                usuario.setSenha(usuarioExistente.getSenha());
+            }
 
             usuario.setId(id);
             usuario = service.salvar(usuario);
 
-            return ResponseEntity.ok(usuario);
-        } catch (RegraNegocioException e) {
+            return ResponseEntity.ok(UsuarioDTO.create(usuario));
 
+        } catch (RegraNegocioException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @DeleteMapping("{id}")
     @Operation(summary = "Excluir usuário")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Usuário excluído com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Falha ao excluir usuário")
-    })
-    public ResponseEntity excluir(@PathVariable("id") @Parameter(description = "Id do usuário") Long id) {
+    public ResponseEntity<?> excluir(
+            @PathVariable("id") Long id,
+            Authentication authentication) {
+
         Optional<Usuario> usuario = service.getUsuariosById(id);
-        if (!usuario.isPresent()) {
-            return new ResponseEntity("Usuario não encontrado", HttpStatus.NOT_FOUND);
+
+        if (usuario.isEmpty()) {
+            return ResponseEntity.notFound().build();
         }
+
+        boolean administrador = isAdministrador(authentication);
+        boolean proprioUsuario = isProprioUsuario(usuario.get(), authentication);
+
+        if (!administrador && !proprioUsuario) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
         try {
             service.excluir(usuario.get());
-            return new ResponseEntity(HttpStatus.NO_CONTENT);
+            return ResponseEntity.noContent().build();
+
         } catch (RegraNegocioException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -151,28 +210,10 @@ public class UsuarioController {
             throw new RegraNegocioException("Tipo de usuário é obrigatório");
         }
 
-        Usuario usuario = switch (dto.getTipoUsuario()) {
-
+        return switch (dto.getTipoUsuario()) {
             case PF -> modelMapper.map(dto, UsuarioPessoaFisica.class);
-
             case PJ -> modelMapper.map(dto, UsuarioPessoaJuridica.class);
         };
-
-        if (dto.getPerfis() != null && !dto.getPerfis().isEmpty()) {
-
-            usuario.setPerfis(
-                    dto.getPerfis()
-                            .stream()
-                            .map(Perfil::valueOf)
-                            .collect(java.util.stream.Collectors.toList())
-            );
-
-        } else {
-            usuario.setPerfis(List.of(Perfil.PARTICIPANTE));
-        }
-
-        return usuario;
-
     }
 
     @PostMapping("/auth")
@@ -193,5 +234,19 @@ public class UsuarioController {
         } catch (UsernameNotFoundException | SenhaInvalidaException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email ou senha inválidos");
         }
+    }
+
+    private boolean isAdministrador(Authentication authentication) {
+        return authentication.getAuthorities()
+                .stream()
+                .anyMatch(autoridade ->
+                        autoridade.getAuthority().equals("ROLE_ADMINISTRADOR"));
+    }
+
+    private boolean isProprioUsuario(
+            Usuario usuario,
+            Authentication authentication) {
+
+        return usuario.getEmail().equalsIgnoreCase(authentication.getName());
     }
 }
