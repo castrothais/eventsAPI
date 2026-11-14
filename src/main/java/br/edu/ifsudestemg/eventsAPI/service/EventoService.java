@@ -5,6 +5,9 @@ import br.edu.ifsudestemg.eventsAPI.model.entity.Evento;
 import br.edu.ifsudestemg.eventsAPI.model.repository.EventoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import br.edu.ifsudestemg.eventsAPI.model.entity.Ingresso;
+import br.edu.ifsudestemg.eventsAPI.model.entity.StatusIngresso;
+import br.edu.ifsudestemg.eventsAPI.model.repository.IngressoRepository;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -14,10 +17,16 @@ import java.util.Optional;
 
 @Service
 public class EventoService {
-    private EventoRepository repository;
+    private final EventoRepository repository;
+    private final IngressoRepository ingressoRepository;
+    private final CarteiraService carteiraService;
 
-    public EventoService(EventoRepository repository) {
+    public EventoService(EventoRepository repository,
+                         IngressoRepository ingressoRepository,
+                         CarteiraService carteiraService) {
         this.repository = repository;
+        this.ingressoRepository = ingressoRepository;
+        this.carteiraService = carteiraService;
     }
 
     public List<Evento> getEventos() {
@@ -36,8 +45,16 @@ public class EventoService {
 
     @Transactional
     public void excluir(Evento evento) {
-        Objects.requireNonNull(evento.getId());
-        repository.delete(evento);
+        if (evento == null || evento.getId() == null) {
+            throw new RegraNegocioException("Evento não encontrado.");
+        }
+
+        Evento eventoExistente = repository.findById(evento.getId())
+                .orElseThrow(() ->
+                        new RegraNegocioException("Evento não encontrado.")
+                );
+
+        cancelarEvento(eventoExistente);
     }
 
     public void validar(Evento evento) {
@@ -75,21 +92,53 @@ public class EventoService {
         if(evento.getLotacaoMaxima() < evento.getPorteEvento().getMinParticipantes()){
             throw new RegraNegocioException("Lotação abaixo do mínimo do porte");
         }
-
-        if(evento.isCancelado()) {
-            cancelarEvento(evento);
-        }
     }
 
+    @Transactional
     public void cancelarEvento(Evento evento) {
-        if(getEventosById(evento.getId()).isEmpty() || evento.getId() == null){
-            throw new RegraNegocioException("Evento não encontrado");
-        }
+            if (evento == null || evento.getId() == null) {
+                throw new RegraNegocioException("Evento não encontrado.");
+            }
 
-        long horasRestantes = Math.max(0, ChronoUnit.HOURS.between(LocalDateTime.now(), evento.getDataHoraInicio()));
-        if (horasRestantes < evento.getPorteEvento().getTempoMinimoCancelamento()) {
-            throw new RegraNegocioException("Cancelamento não permitido, tempo de cncelamento inferior ao permitido " +
-                    evento.getPorteEvento().getTempoMinimoCancelamento() + " horas");
+            if (evento.isCancelado()) {
+                throw new RegraNegocioException("Este evento já foi cancelado.");
+            }
+
+            long horasRestantes = Math.max(
+                    0,
+                    ChronoUnit.HOURS.between(
+                            LocalDateTime.now(),
+                            evento.getDataHoraInicio()
+                    )
+            );
+
+            if (horasRestantes < evento.getPorteEvento().getTempoMinimoCancelamento()) {
+                throw new RegraNegocioException(
+                        "Cancelamento não permitido. O prazo mínimo é de "
+                                + evento.getPorteEvento().getTempoMinimoCancelamento()
+                                + " horas."
+                );
+            }
+
+            List<Ingresso> ingressos = ingressoRepository.findByEvento_Id(evento.getId());
+
+            for (Ingresso ingresso : ingressos) {
+
+                if (ingresso.getStatus() == StatusIngresso.PAGO) {
+                    carteiraService.creditar(
+                            ingresso.getParticipante(),
+                            ingresso.getValor(),
+                            ingresso
+                    );
+
+                    ingresso.setStatus(StatusIngresso.CANCELADO);
+                }
+
+                else if (ingresso.getStatus() == StatusIngresso.RESERVADO) {
+                    ingresso.setStatus(StatusIngresso.CANCELADO);
+                }
+            }
+            evento.setCancelado(true);
+            repository.save(evento);
         }
     }
-}
