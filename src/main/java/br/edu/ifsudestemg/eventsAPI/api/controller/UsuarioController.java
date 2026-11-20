@@ -101,6 +101,38 @@ public class UsuarioController {
         return ResponseEntity.ok(UsuarioDTO.create(usuario.get()));
     }
 
+    @PostMapping("/admin")
+    @Operation(summary = "Cadastrar novo administrador")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Administrador cadastrado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos ou regra de negócio violada")
+    })
+    public ResponseEntity<?> cadastrarAdministrador(
+            @Valid @RequestBody UsuarioDTO dto) {
+
+        try {
+            if (dto.getSenha() == null || dto.getSenha().isBlank()) {
+                return ResponseEntity.badRequest().body("Senha inválida");
+            }
+
+            service.validarSenhaForte(dto.getSenha());
+
+            Usuario usuario = converter(dto);
+
+            usuario.setPerfis(List.of(Perfil.ADMINISTRADOR));
+
+            usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
+
+            usuario = service.salvar(usuario);
+
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(UsuarioDTO.create(usuario));
+
+        } catch (RegraNegocioException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @PostMapping()
     @Operation(summary = "Salvar usuário")
     @ApiResponses(value = {
