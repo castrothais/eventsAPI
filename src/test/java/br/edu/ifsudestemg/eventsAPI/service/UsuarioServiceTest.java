@@ -204,7 +204,7 @@ class UsuarioServiceTest {
         expect(usuario.getSenha()).andStubReturn("senhaTeste");
         expect(usuario.getPerfis()).andStubReturn(List.of(Perfil.MEDIADOR));
 
-        expect(repository.findByEmail("teste@email.com")).andReturn(Optional.of(usuario));
+        expect(repository.findByEmailIgnoreCase("teste@email.com")).andReturn(Optional.of(usuario));
         expect(encoder.matches("Ab1@xy", "senhaTeste")).andReturn(true);
 
         replay(repository, validator, encoder, carteiraService, usuario);
@@ -222,7 +222,7 @@ class UsuarioServiceTest {
         expect(usuario.getSenha()).andStubReturn("senhaTeste");
         expect(usuario.getPerfis()).andStubReturn(List.of(Perfil.MEDIADOR));
 
-        expect(repository.findByEmail("teste@email.com")).andReturn(Optional.of(usuario));
+        expect(repository.findByEmailIgnoreCase("teste@email.com")).andReturn(Optional.of(usuario));
         expect(encoder.matches("senhaErrada", "senhaTeste")).andReturn(false);
 
         replay(repository, validator, encoder, carteiraService, usuario);
@@ -233,7 +233,7 @@ class UsuarioServiceTest {
 
     @Test
     void deveLancarUsernameNotFoundExceptionQuandoEmailNaoForEncontradoNoLoadUserByUsername() {
-        expect(repository.findByEmail("inexistente@email.com")).andReturn(Optional.empty());
+        expect(repository.findByEmailIgnoreCase("inexistente@email.com")).andReturn(Optional.empty());
 
         replay(repository, validator, encoder, carteiraService, usuario);
 
@@ -247,7 +247,7 @@ class UsuarioServiceTest {
 
     @Test
     void deveRetornarUsuarioQuandoBuscarPorEmailExistente() {
-        expect(repository.findByEmail("teste@email.com")).andReturn(Optional.of(usuario));
+        expect(repository.findByEmailIgnoreCase("teste@email.com")).andReturn(Optional.of(usuario));
 
         replay(repository, validator, encoder, carteiraService, usuario);
 
@@ -259,7 +259,7 @@ class UsuarioServiceTest {
 
     @Test
     void deveLancarUsernameNotFoundExceptionQuandoBuscarPorEmailInexistente() {
-        expect(repository.findByEmail("naoexiste@email.com")).andReturn(Optional.empty());
+        expect(repository.findByEmailIgnoreCase("naoexiste@email.com")).andReturn(Optional.empty());
 
         replay(repository, validator, encoder, carteiraService, usuario);
 
