@@ -40,8 +40,8 @@ public class Evento {
     @Size(min = 1, max = 500, message = "A descrição deve ter entre 1 e 255 caracteres")
     private String descricao;
 
-    @Min(0)
-    @Max(18)
+    @Min(18)
+    @Max(120)
     @NotNull(message = "Idade mínima obrigatória")
     private Integer idadeMinima;
 

@@ -97,8 +97,6 @@ public class SecurityConfig  {
 
                         .requestMatchers(HttpMethod.GET, "/api/v1/presencas/**")
                         .hasAnyRole("ADMINISTRADOR","ORGANIZADOR","MEDIADOR","PARTICIPANTE")
-                        //.requestMatchers("/api/v1/presencas/**")
-                        //.hasAnyRole("ADMINISTRADOR")
 
                         .requestMatchers(HttpMethod.GET, "/api/v1/tipoAtividade/**")
                         .hasAnyRole("ADMINISTRADOR","ORGANIZADOR","MEDIADOR")
@@ -118,10 +116,14 @@ public class SecurityConfig  {
 
                         .requestMatchers(HttpMethod.GET, "/api/v1/usuario/{id}")
                         .authenticated()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/usuario/**")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/usuario")
                         .permitAll()
-                        //.requestMatchers("/api/v1/usuario/**")
-                        //.hasAnyRole("ADMINISTRADOR","ORGANIZADOR","MEDIADOR")
+
+                        .requestMatchers(HttpMethod.POST, "/api/v1/usuario/auth")
+                        .permitAll()
+
+                        .requestMatchers(HttpMethod.POST, "/api/v1/usuario/admin")
+                        .hasRole("ADMINISTRADOR")
 
                         .requestMatchers("/api/v1/usuario/auth").permitAll()
                         .anyRequest().authenticated()
@@ -160,63 +162,3 @@ public class SecurityConfig  {
         return source;
     }
 }
-
-//    @Bean
-//    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        http
-//                .csrf(csrf -> csrf.disable())
-//                .cors(cors -> cors.disable())
-//                .sessionManagement(session ->
-//                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-//                .authorizeHttpRequests(auth -> auth
-//
-//                        .requestMatchers(HttpMethod.GET, "/api/v1/atividades/**")
-//                        .hasAnyRole("ADMINISTRADOR","ORGANIZADOR","MEDIADOR","PARTICIPANTE")
-//                        .requestMatchers("/api/v1/atividades/**")
-//                        .hasAnyRole("ADMINISTRADOR","ORGANIZADOR","MEDIADOR")
-//
-//                        .requestMatchers(HttpMethod.GET, "/api/v1/eventos/**")
-//                        .hasAnyRole("ADMINISTRADOR","ORGANIZADOR","MEDIADOR","PARTICIPANTE")
-//                        .requestMatchers("/api/v1/eventos/**")
-//                        .hasAnyRole("ADMINISTRADOR","ORGANIZADOR","MEDIADOR")
-//
-//                        .requestMatchers(HttpMethod.GET, "/api/v1/ingressos/**")
-//                        .hasAnyRole("ADMINISTRADOR", "ORGANIZADOR", "MEDIADOR", "PARTICIPANTE")
-//                        .requestMatchers("/api/v1/ingressos/**")
-//                        .hasAnyRole("ADMINISTRADOR", "PARTICIPANTE")
-//
-//                        .requestMatchers(HttpMethod.GET, "/api/v1/porteEvento/**")
-//                        .hasAnyRole("ADMINISTRADOR","ORGANIZADOR","MEDIADOR")
-//                        .requestMatchers("/api/v1/porteEvento/**")
-//                        .hasAnyRole("ADMINISTRADOR")
-//
-//                        .requestMatchers(HttpMethod.GET, "/api/v1/presencas/**")
-//                        .hasAnyRole("ADMINISTRADOR","ORGANIZADOR","MEDIADOR","PARTICIPANTE")
-//                        //.requestMatchers("/api/v1/presencas/**")
-//                        //.hasAnyRole("ADMINISTRADOR")
-//
-//                        .requestMatchers(HttpMethod.GET, "/api/v1/tipoAtividade/**")
-//                        .hasAnyRole("ADMINISTRADOR","ORGANIZADOR","MEDIADOR")
-//                        .requestMatchers("/api/v1/tipoAtividade/**")
-//                        .hasAnyRole("ADMINISTRADOR")
-//
-//                        .requestMatchers(HttpMethod.GET, "/api/v1/tipoEvento/**")
-//                        .hasAnyRole("ADMINISTRADOR","ORGANIZADOR","MEDIADOR")
-//                        .requestMatchers("/api/v1/tipoEvento/**")
-//                        .hasAnyRole("ADMINISTRADOR")
-//
-//                        .requestMatchers(HttpMethod.GET, "/api/v1/usuario/**")
-//                        .hasAnyRole("ADMINISTRADOR","ORGANIZADOR","MEDIADOR","PARTICIPANTE")
-//                        //.requestMatchers("/api/v1/usuario/**")
-//                        //.hasAnyRole("ADMINISTRADOR","ORGANIZADOR","MEDIADOR")
-//
-//                        .anyRequest()
-//                        .authenticated()
-//                )
-//                .addFilterBefore(
-//                        jwtFilter(),
-//                        UsernamePasswordAuthenticationFilter.class
-//                );
-//
-//        return http.build();
-//    }

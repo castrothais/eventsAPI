@@ -117,7 +117,7 @@ public class UsuarioService implements UserDetailsService{
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Usuario usuario = repository.findByEmail(email)
+        Usuario usuario = repository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
 
         String[] roles = usuario.getPerfis()
@@ -134,7 +134,7 @@ public class UsuarioService implements UserDetailsService{
     }
 
     public Usuario buscarPorEmail(String email){
-        return repository.findByEmail(email)
+        return repository.findByEmailIgnoreCase(email)
                 .orElseThrow(()-> new UsernameNotFoundException("Usuário não encontrado"));
     }
 }
