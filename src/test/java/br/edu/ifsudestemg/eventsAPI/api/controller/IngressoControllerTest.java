@@ -2,6 +2,7 @@ package br.edu.ifsudestemg.eventsAPI.api.controller;
 
 import br.edu.ifsudestemg.eventsAPI.api.dto.IngressoDTO;
 import br.edu.ifsudestemg.eventsAPI.api.dto.PagamentoIngressoDTO;
+import br.edu.ifsudestemg.eventsAPI.api.exeption.RegraNegocioException;
 import br.edu.ifsudestemg.eventsAPI.model.entity.Evento;
 import br.edu.ifsudestemg.eventsAPI.model.entity.Ingresso;
 import br.edu.ifsudestemg.eventsAPI.model.entity.StatusIngresso;
@@ -378,6 +379,82 @@ class IngressoControllerTest {
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         verify(service, carteiraService, ingresso);
+    }
+
+    @Test
+    void devePagarIngressoInteiraComPixSemDebitarNaCarteira() {
+        PagamentoIngressoDTO dto = new PagamentoIngressoDTO();
+        dto.setTipoIngresso("inteira");
+        dto.setFormaPagamento("PIX");
+
+        BigDecimal valor = new BigDecimal("0.01");
+        configurarCenarioBasePagamento(valor);
+
+        ingresso.setTipoIngresso("inteira");
+        expectLastCall().once();
+        ingresso.setValor(valor);
+        expectLastCall().once();
+        ingresso.setStatus(StatusIngresso.PAGO);
+        expectLastCall().once();
+
+        expect(service.salvar(ingresso)).andReturn(ingresso);
+
+        replay(service, eventoService, usuarioService, carteiraService, participante, evento, ingresso, authentication);
+
+        ResponseEntity response = controller.pagarIngresso(1L, dto, authentication);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(service, carteiraService, ingresso);
+    }
+
+    @Test
+    void devePagarIngressoMeiaComCarteiraDebitandoMetadeDoValor() {
+        PagamentoIngressoDTO dto = new PagamentoIngressoDTO();
+        dto.setTipoIngresso("meia");
+        dto.setFormaPagamento("CARTEIRA");
+
+        configurarCenarioBasePagamento(new BigDecimal("0.02"));
+        BigDecimal valorMeia = new BigDecimal("0.01");
+
+        carteiraService.debitar(participante, valorMeia, ingresso);
+        expectLastCall().once();
+
+        ingresso.setTipoIngresso("meia");
+        expectLastCall().once();
+        ingresso.setValor(valorMeia);
+        expectLastCall().once();
+        ingresso.setStatus(StatusIngresso.PAGO);
+        expectLastCall().once();
+
+        expect(service.salvar(ingresso)).andReturn(ingresso);
+
+        replay(service, eventoService, usuarioService, carteiraService, participante, evento, ingresso, authentication);
+
+        ResponseEntity response = controller.pagarIngresso(1L, dto, authentication);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(service, carteiraService, ingresso);
+    }
+
+    @Test
+    void deveRetornarBadRequestNoPagamentoQuandoDebitoDaCarteiraLancarExcecao() {
+        PagamentoIngressoDTO dto = new PagamentoIngressoDTO();
+        dto.setTipoIngresso("inteira");
+        dto.setFormaPagamento("CARTEIRA");
+
+        BigDecimal valor = new BigDecimal("0.01");
+        configurarCenarioBasePagamento(valor);
+
+        carteiraService.debitar(participante, valor, ingresso);
+        expectLastCall().andThrow(new RegraNegocioException("Saldo insuficiente"));
+
+        replay(service, eventoService, usuarioService, carteiraService, participante, evento, ingresso, authentication);
+
+        ResponseEntity response = controller.pagarIngresso(1L, dto, authentication);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Saldo insuficiente", response.getBody());
+        verify(carteiraService);
     }
 
 
